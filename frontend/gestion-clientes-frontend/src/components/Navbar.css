@@ -1,34 +1,45 @@
 .navbar {
-    background-color: #b30000; /* Rojo oscuro */
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: white;
-  }
-  
-  .nav-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
-  }
-  
-  .nav-links a {
-    color: white;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .nav-links a:hover {
-    color: #ffcc00; /* Amarillo dorado */
-    transition: 0.3s;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #8B0000; /* Rojo oscuro */
+  padding: 15px 0;
+  width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.navbar-logo img {
+  width: 70px; /* Tamaño del logo */
+  display: block;
+  margin: 0 auto;
+}
+
+.navbar-title {
+  color: white;
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 5px; /* Espaciado entre logo y título */
+  text-align: center;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 25px;
+  margin-top: 8px;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.navbar-links a:hover {
+  color: #ffcc00; /* Amarillo al pasar el mouse */
+}

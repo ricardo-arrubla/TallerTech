@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div>
-      <h1>Prueba de conexión</h1>
+      <h1></h1>
       <p>{message}</p> {/* Aquí deberíamos ver el mensaje del backend */}
       <AppRoutes />
     </div>

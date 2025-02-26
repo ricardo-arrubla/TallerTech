@@ -1,9 +1,11 @@
 body {
-  background-color: #1c1c1c; /* Gris oscuro */
-  color: white;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
+  background-color: #F2F3F4; /* Blanco mármol */
+  color: #333; /* Color de texto */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
+
 
 h1 {
   color: #ffcc00; /* Amarillo para que resalte */
@@ -11,7 +13,7 @@ h1 {
 }
 
 p {
-  color: #e0e0e0; /* Un gris más claro */
+  color: #030303; /* Un gris más claro */
   font-size: 18px;
 }
 
@@ -39,4 +41,8 @@ button:hover {
   background-color: #ffcc00; /* Amarillo */
   color: #1c1c1c; /* Gris oscuro */
   transition: 0.3s;
+}
+
+body {
+  font-family: 'Playfair Display', serif; /* Se aplicará a toda la web */
 }
