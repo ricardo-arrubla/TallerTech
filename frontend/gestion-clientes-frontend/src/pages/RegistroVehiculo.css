@@ -1,0 +1,45 @@
+.registro-vehiculo-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .registro-vehiculo-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .registro-vehiculo-container label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
+  .registro-vehiculo-container input,
+  .registro-vehiculo-container select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .registro-vehiculo-container button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .registro-vehiculo-container button:hover {
+    background-color: #0056b3;
+  }

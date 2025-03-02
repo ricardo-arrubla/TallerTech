@@ -1,0 +1,108 @@
+.diagnostico-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff8e1;
+    border-radius: 10px;
+    width: 85%;
+    margin: 30px auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Representación del auto */
+  .auto-diagrama {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #f4f4f4;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+    margin: auto;
+    position: relative;
+  }
+  
+  .parte {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px;
+  }
+  
+  .motor {
+    background-color: #ddd;
+  }
+  
+  .bateria {
+    background-color: #ddd;
+  }
+  
+  .frenos {
+    background-color: #ddd;
+  }
+  
+  .ruedas {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .rueda {
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  /* Estados de alerta */
+  .ok {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .advertencia {
+    background-color: #ff9800;
+    color: white;
+  }
+  
+  .alerta {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  /* Panel de diagnóstico */
+  .diagnostico-panel {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  
+  .chart {
+    width: 45%;
+    min-width: 300px;
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+  }
+  
+  .estado-vehiculo {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+  
+  .estado-vehiculo ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .estado-vehiculo li {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  

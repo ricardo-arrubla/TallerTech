@@ -1,33 +1,23 @@
 body {
   background-color: #F2F3F4; /* Blanco mármol */
-  color: #333; /* Color de texto */
-  font-family: Arial, sans-serif;
+  color: #333;
+  font-family: 'Playfair Display', serif;
   margin: 0;
-  padding: 0;
+  padding-top: 90px; /* Ajustado para el navbar */
 }
 
-
 h1 {
-  color: #ffcc00; /* Amarillo para que resalte */
-  font-size: 40px;
+  color: #8B0000; /* Rojo oscuro */
+  font-size: 32px;
 }
 
 p {
-  color: #030303; /* Un gris más claro */
+  color: #030303;
   font-size: 18px;
 }
 
-.container {
-  max-width: 900px;
-  margin: 50px auto;
-  background-color: #333; /* Gris oscuro */
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
 button {
-  background-color: #b30000; /* Rojo oscuro */
+  background-color: #b30000;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -35,14 +25,36 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #ffcc00; /* Amarillo */
-  color: #1c1c1c; /* Gris oscuro */
-  transition: 0.3s;
+  background-color: #ffcc00;
+  color: #1c1c1c;
 }
 
-body {
-  font-family: 'Playfair Display', serif; /* Se aplicará a toda la web */
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  color: black;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
 }
+
+.popup button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.popup button:hover {
+  background-color: darkred;
+}
+

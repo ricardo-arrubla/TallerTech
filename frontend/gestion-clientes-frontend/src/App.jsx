@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
 import AppRoutes from "./routes/AppRoutes";
-import "./App.css"; // Asegúrate de que esto está presente
+import "./App.css";
 
 function App() {
   const [message, setMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Respuesta del backend:", data); // 👀 Ver qué llega aquí
         setMessage(data.message);
+        setShowPopup(true);
       })
-      .catch((error) => console.error("Error al conectar con el backend:", error));
+      .catch(() => {
+        setMessage("No se pudo conectar con el backend ❌");
+        setShowPopup(true);
+      });
   }, []);
 
   return (
     <div>
-      <h1></h1>
-      <p>{message}</p> {/* Aquí deberíamos ver el mensaje del backend */}
+      {showPopup && (
+        <div className="popup">
+          <p>{message}</p>
+          <button onClick={() => setShowPopup(false)}>Cerrar</button>
+        </div>
+      )}
       <AppRoutes />
     </div>
   );

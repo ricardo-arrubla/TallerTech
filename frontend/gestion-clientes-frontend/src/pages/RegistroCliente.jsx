@@ -17,10 +17,18 @@ const RegistroCliente = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
+    if (!cliente.nombre || !cliente.id || !cliente.placa) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+  
     console.log("Cliente registrado:", cliente);
     alert("Cliente registrado correctamente 🚗");
+  
     setCliente({ nombre: "", id: "", placa: "", marca: "Chevrolet" }); // Limpiar formulario
   };
+  
 
   return (
     <div className="registro-container">
@@ -43,6 +51,9 @@ const RegistroCliente = () => {
         </select>
 
         <button type="submit">Registrar Cliente</button>
+        <button onClick={() => navigate("/inspeccion")} className="btn-siguiente">
+        Siguiente ➡
+      </button>
       </form>
     </div>
   );
