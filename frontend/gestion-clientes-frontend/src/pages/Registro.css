@@ -1,0 +1,80 @@
+/* 🌟 Contenedor principal */
+.registro-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f4f1ea;
+    padding: 20px;
+  }
+  
+  /* 📌 Título */
+  .registro-titulo {
+    font-size: 32px;
+    font-weight: bold;
+    color: #8b0000;
+    margin-bottom: 10px;
+  }
+  
+  /* 📌 Subtítulo */
+  .registro-subtitulo {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 30px;
+  }
+  
+  /* 📌 Contenedor de opciones */
+  .registro-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  /* 📌 Tarjetas de opciones */
+  .registro-card {
+    width: 250px;
+    background: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s ease-in-out;
+  }
+  
+  .registro-card:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 📌 Iconos */
+  .registro-card i {
+    font-size: 40px;
+    color: #8b0000;
+    margin-bottom: 10px;
+  }
+  
+  .registro-card h3 {
+    font-size: 20px;
+    color: #8b0000;
+  }
+  
+  .registro-card p {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* 📱 Responsividad */
+  @media (max-width: 768px) {
+    .registro-options {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .registro-card {
+      width: 90%;
+    }
+  }
+  

@@ -1,22 +1,26 @@
 import { useState, useEffect } from "react";
+import { Bar } from "react-chartjs-2";
+import "chart.js/auto";
 import "./Consulta.css";
 
 const Consulta = () => {
   // Datos de consumos (Simulados)
   const [consumos, setConsumos] = useState([
-    { id: "001", cliente: "Juan Pérez", placa: "ABC123", servicio: "Cambio de Aceite", precio: 30 },
-    { id: "002", cliente: "María García", placa: "XYZ789", servicio: "Alineación y Balanceo", precio: 50 },
-    { id: "003", cliente: "Carlos López", placa: "LMN456", servicio: "Cambio de Filtros", precio: 40 },
-    { id: "004", cliente: "Juan Pérez", placa: "ABC123", servicio: "Revisión General", precio: 80 },
+    { id: "001", cliente: "Juan Pérez", placa: "ABC123", servicio: "Cambio de Aceite", precio: 30, fecha: "2023-10-10", estado: "Completado" },
+    { id: "002", cliente: "María García", placa: "XYZ789", servicio: "Alineación y Balanceo", precio: 50, fecha: "2023-10-15", estado: "Pendiente" },
+    { id: "003", cliente: "Carlos López", placa: "LMN456", servicio: "Cambio de Filtros", precio: 40, fecha: "2023-09-28", estado: "Cancelado" },
+    { id: "004", cliente: "Juan Pérez", placa: "ABC123", servicio: "Revisión General", precio: 80, fecha: "2023-10-20", estado: "Completado" },
   ]);
 
-  // Estado para la búsqueda
+  // Estado para la búsqueda y filtros
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("cliente");
+  const [estadoFiltro, setEstadoFiltro] = useState("Todos");
 
-  // Filtrar consumos según búsqueda
-  const consumosFiltrados = consumos.filter((c) =>
-    c[filtro].toLowerCase().includes(busqueda.toLowerCase())
+  // Filtrar consumos según búsqueda y estado
+  const consumosFiltrados = consumos.filter((c) => 
+    c[filtro].toLowerCase().includes(busqueda.toLowerCase()) &&
+    (estadoFiltro === "Todos" || c.estado === estadoFiltro)
   );
 
   // Calcular total de gastos por cliente
@@ -28,11 +32,24 @@ const Consulta = () => {
     return totalPorCliente;
   };
 
+  // Datos para la gráfica de gastos por cliente
+  const dataGastos = {
+    labels: Object.keys(calcularTotal()),
+    datasets: [
+      {
+        label: "Total Gastado ($)",
+        data: Object.values(calcularTotal()),
+        backgroundColor: ["#8b0000", "#f39c12", "#3498db"],
+      },
+    ],
+  };
+
   return (
     <div className="consulta-container">
       <h2>📊 Consulta de Consumos</h2>
+      <p>Revisa el historial de consumos y servicios realizados en el taller.</p>
 
-      {/* Barra de búsqueda */}
+      {/* Barra de búsqueda y filtros */}
       <div className="busqueda-container">
         <input
           type="text"
@@ -44,6 +61,12 @@ const Consulta = () => {
           <option value="cliente">Cliente</option>
           <option value="placa">Placa</option>
         </select>
+        <select onChange={(e) => setEstadoFiltro(e.target.value)}>
+          <option value="Todos">Todos</option>
+          <option value="Completado">Completado</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
       </div>
 
       {/* Tabla de consumos */}
@@ -54,7 +77,10 @@ const Consulta = () => {
             <th>Cliente</th>
             <th>Placa</th>
             <th>Servicio</th>
+            <th>Fecha</th>
+            <th>Estado</th>
             <th>Precio ($)</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -65,26 +91,29 @@ const Consulta = () => {
                 <td>{c.cliente}</td>
                 <td>{c.placa}</td>
                 <td>{c.servicio}</td>
+                <td>{c.fecha}</td>
+                <td className={`estado ${c.estado.toLowerCase()}`}>{c.estado}</td>
                 <td>${c.precio}</td>
+                <td>
+                  <button className="btn-ver">👁 Ver</button>
+                  <button className="btn-editar">✏ Editar</button>
+                  <button className="btn-eliminar">🗑 Eliminar</button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5">No se encontraron consumos.</td>
+              <td colSpan="8">No se encontraron consumos.</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Total gastado por cliente */}
-      <h3>💰 Total de Gastos por Cliente</h3>
-      <ul>
-        {Object.entries(calcularTotal()).map(([cliente, total]) => (
-          <li key={cliente}>
-            {cliente}: ${total}
-          </li>
-        ))}
-      </ul>
+      {/* Gráfico de gastos por cliente */}
+      <h3>📈 Gastos por Cliente</h3>
+      <div className="grafico-container">
+        <Bar data={dataGastos} />
+      </div>
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("usuario");
@@ -12,23 +14,33 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
+      {/* Logo y Nombre */}
       <div className="navbar-logo">
-        <img src="/TallerTechLogo2.png" alt="TallerTech Logo" />
-        <h1>TallerTech</h1>
+        <img src="/TallerTechLogo3.png" alt="TallerTech Logo" />
+        <h1 className="navbar-title">TallerTech</h1>
       </div>
-      <div className="navbar-links">
-        <Link to="/">Inicio</Link>
-        <Link to="/registro">Registro</Link>
-        <Link to="/consulta">Consulta</Link>
-        <Link to="/clientes">Clientes</Link>
-        <Link to="/inspeccion-vehiculo">Inspección</Link>
-        <Link to="/diagnostico-vehiculo">Diagnóstico</Link>
-        <Link to="/perfil-taller">Perfil del Taller</Link> {/* Nuevo enlace */}
-        <Link to="/facturacion">Facturación</Link> {/* Nuevo enlace */}
-        <Link to="/agendar-cita">Agendar Cita</Link> {/* Nuevo enlace */}
 
-        <button className="logout-btn" onClick={handleLogout}>🚪 Cerrar Sesión</button>
-        
+      {/* Botón para abrir/cerrar menú en móviles */}
+      <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>
+        ☰
+      </button>
+
+      {/* Enlaces del menú */}
+      <div className={`navbar-links ${menuAbierto ? "abierto" : ""}`}>
+        <Link to="/">🏠 Inicio</Link>
+        <Link to="/registro">📄 Registro</Link>
+        <Link to="/consulta">🔍 Consulta</Link>
+        <Link to="/clientes">👥 Clientes</Link>
+        <Link to="/inspeccion-vehiculo">🛠 Inspección</Link>
+        <Link to="/diagnostico-vehiculo">⚙ Diagnóstico</Link>
+        <Link to="/perfil-taller">🏪 Perfil Taller</Link>
+        <Link to="/facturacion">💰 Facturación</Link>
+        <Link to="/agendar-cita">📅 Agendar Cita</Link>
+
+        {/* Botón de Cerrar Sesión */}
+        <button className="logout-btn" onClick={handleLogout}>
+          🚪 Cerrar Sesión
+        </button>
       </div>
     </nav>
   );

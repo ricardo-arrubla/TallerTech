@@ -1,46 +1,115 @@
-body {
-  font-family: 'Playfair Display', serif;
+/* 🌟 Contenedor Principal */
+.home-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  text-align: center;
   background-color: #F4F1EA;
-  margin: 0;
-  padding-top: 90px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.home-container {
+/* 📌 Encabezado */
+.header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  margin: auto;
-  width: 50%;
-  background-color: #FFF8E1;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-  min-height: 60vh;
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
-.home-buttons {
+.header .logo {
+  width: 80px;
+  opacity: 0.9;
+}
+
+/* 📌 Métricas */
+.metricas {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 180px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* 📊 Gráfico */
+.grafico-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* 🚀 Acciones Rápidas */
+.acciones-rapidas {
+  margin-bottom: 20px;
+}
+
+.acciones-botones {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-/* Botones */
 .btn {
-  padding: 12px 20px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.btn.primary {
   background-color: #8B0000;
   color: white;
+  padding: 12px 18px;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: 0.3s;
 }
 
-.btn.primary:hover {
+.btn:hover {
   background-color: #ffcc00;
-  color: #333;
+  color: black;
+}
+
+/* 🕒 Actividades Recientes */
+.actividades {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.actividades ul {
+  list-style: none;
+  padding: 0;
+}
+
+.actividades li {
+  padding: 5px;
+  font-size: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.actividades li:last-child {
+  border-bottom: none;
+}
+
+/* 📱 Responsividad */
+@media (max-width: 768px) {
+  .metricas {
+    flex-direction: column;
+  }
+
+  .acciones-botones {
+    flex-direction: column;
+  }
 }
