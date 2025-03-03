@@ -1,45 +1,95 @@
+/* 🌟 Contenedor Principal */
 .registro-vehiculo-container {
-    max-width: 500px;
-    margin: 0 auto;
+  max-width: 500px;
+  margin: 0 auto; /* Centrado horizontal */
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* 📌 Centrado vertical y horizontal */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f9;
+}
+
+/* 🎨 Título */
+h2 {
+  text-align: center;
+  color: #8b0000;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* 🖋 Formulario */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🖊 Inputs y Selects */
+input,
+select {
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #8b0000;
+  outline: none;
+  box-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+}
+
+/* 🛠 Botones */
+button {
+  background-color: #8b0000;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ffcc00;
+  color: #1c1c1c;
+}
+
+/* 🔘 Etiquetas */
+label {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #333;
+}
+
+/* 🔻 Responsive Design */
+@media (max-width: 600px) {
+  .registro-vehiculo-container {
+    width: 95%;
     padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
-  .registro-vehiculo-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
+
+  h2 {
+    font-size: 20px;
   }
-  
-  .registro-vehiculo-container label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
+
+  input,
+  select {
+    font-size: 14px;
   }
-  
-  .registro-vehiculo-container input,
-  .registro-vehiculo-container select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .registro-vehiculo-container button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  .registro-vehiculo-container button:hover {
-    background-color: #0056b3;
-  }
+}

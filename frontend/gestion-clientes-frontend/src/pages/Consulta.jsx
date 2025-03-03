@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import "./Consulta.css";
@@ -17,11 +17,44 @@ const Consulta = () => {
   const [filtro, setFiltro] = useState("cliente");
   const [estadoFiltro, setEstadoFiltro] = useState("Todos");
 
+  // Estado para el modal de edición
+  const [modalVisible, setModalVisible] = useState(false);
+  const [consumoEditando, setConsumoEditando] = useState(null);
+
   // Filtrar consumos según búsqueda y estado
   const consumosFiltrados = consumos.filter((c) => 
     c[filtro].toLowerCase().includes(busqueda.toLowerCase()) &&
     (estadoFiltro === "Todos" || c.estado === estadoFiltro)
   );
+
+  // Función para ver detalles de un consumo
+  const handleVer = (consumo) => {
+    alert(`Detalles del consumo:\n\nCliente: ${consumo.cliente}\nPlaca: ${consumo.placa}\nServicio: ${consumo.servicio}\nFecha: ${consumo.fecha}\nEstado: ${consumo.estado}\nPrecio: $${consumo.precio}`);
+  };
+
+  // Función para abrir el modal de edición
+  const handleEditar = (id) => {
+    const consumoSeleccionado = consumos.find((c) => c.id === id);
+    setConsumoEditando(consumoSeleccionado);
+    setModalVisible(true);
+  };
+
+  // Función para eliminar un consumo
+  const handleEliminar = (id) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este consumo?")) {
+      setConsumos(consumos.filter((c) => c.id !== id));
+    }
+  };
+
+  // Función para guardar los cambios del consumo editado
+  const handleGuardarCambios = () => {
+    setConsumos((prevConsumos) =>
+      prevConsumos.map((c) =>
+        c.id === consumoEditando.id ? consumoEditando : c
+      )
+    );
+    setModalVisible(false); // Cerrar el modal después de guardar
+  };
 
   // Calcular total de gastos por cliente
   const calcularTotal = () => {
@@ -95,9 +128,9 @@ const Consulta = () => {
                 <td className={`estado ${c.estado.toLowerCase()}`}>{c.estado}</td>
                 <td>${c.precio}</td>
                 <td>
-                  <button className="btn-ver">👁 Ver</button>
-                  <button className="btn-editar">✏ Editar</button>
-                  <button className="btn-eliminar">🗑 Eliminar</button>
+                  <button className="btn-ver" onClick={() => handleVer(c)}>👁 Ver</button>
+                  <button className="btn-editar" onClick={() => handleEditar(c.id)}>✏ Editar</button>
+                  <button className="btn-eliminar" onClick={() => handleEliminar(c.id)}>🗑 Eliminar</button>
                 </td>
               </tr>
             ))
@@ -108,6 +141,88 @@ const Consulta = () => {
           )}
         </tbody>
       </table>
+
+      {/* Modal de edición */}
+      {modalVisible && consumoEditando && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Editar Consumo</h3>
+            <form>
+              <label>
+                Cliente:
+                <input
+                  type="text"
+                  value={consumoEditando.cliente}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, cliente: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Placa:
+                <input
+                  type="text"
+                  value={consumoEditando.placa}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, placa: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Servicio:
+                <input
+                  type="text"
+                  value={consumoEditando.servicio}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, servicio: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Precio:
+                <input
+                  type="number"
+                  value={consumoEditando.precio}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, precio: Number(e.target.value) })
+                  }
+                />
+              </label>
+              <label>
+                Fecha:
+                <input
+                  type="date"
+                  value={consumoEditando.fecha}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, fecha: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Estado:
+                <select
+                  value={consumoEditando.estado}
+                  onChange={(e) =>
+                    setConsumoEditando({ ...consumoEditando, estado: e.target.value })
+                  }
+                >
+                  <option value="Completado">Completado</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </label>
+              <div className="modal-actions">
+                <button type="button" onClick={() => setModalVisible(false)}>
+                  Cancelar
+                </button>
+                <button type="button" onClick={handleGuardarCambios}>
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Gráfico de gastos por cliente */}
       <h3>📈 Gastos por Cliente</h3>

@@ -10,7 +10,24 @@ const RegistroVehiculo = () => {
     clienteId: "",
   });
 
-  const marcas = ["Chevrolet", "Tesla", "Toyota", "Ford", "Honda"];
+  // Ampliamos la lista de marcas
+  const marcas = [
+    "Chevrolet",
+    "Tesla",
+    "Toyota",
+    "Ford",
+    "Honda",
+    "BMW",
+    "Mercedes-Benz",
+    "Audi",
+    "Volkswagen",
+    "Nissan",
+    "Hyundai",
+    "Kia",
+    "Mazda",
+    "Subaru",
+    "Lexus",
+  ];
 
   const handleChange = (e) => {
     setVehiculo({ ...vehiculo, [e.target.name]: e.target.value });
@@ -48,7 +65,9 @@ const RegistroVehiculo = () => {
         <label>Marca:</label>
         <select name="marca" value={vehiculo.marca} onChange={handleChange} required>
           {marcas.map((marca, index) => (
-            <option key={index} value={marca}>{marca}</option>
+            <option key={index} value={marca}>
+              {marca}
+            </option>
           ))}
         </select>
 

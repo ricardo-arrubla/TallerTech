@@ -4,10 +4,15 @@ import "./RegistroConsumo.css";
 const RegistroConsumo = () => {
   const [consumo, setConsumo] = useState({
     clienteId: "",
+    placaVehiculo: "", // Nueva propiedad
     servicio: "",
     costo: "",
     fecha: "",
   });
+
+  // Datos simulados de clientes y vehículos
+  const clientesRegistrados = ["C001", "C002", "C003"];
+  const placasVehiculos = ["ABC123", "XYZ456", "DEF789"];
 
   const serviciosDisponibles = [
     "Cambio de Aceite",
@@ -23,9 +28,23 @@ const RegistroConsumo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!consumo.clienteId || !consumo.servicio || !consumo.costo || !consumo.fecha) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+
     console.log("Consumo registrado:", consumo);
     alert("Consumo registrado correctamente ✅");
-    setConsumo({ clienteId: "", servicio: "", costo: "", fecha: "" }); // Limpiar formulario
+
+    // Limpiar formulario
+    setConsumo({
+      clienteId: "",
+      placaVehiculo: "",
+      servicio: "",
+      costo: "",
+      fecha: "",
+    });
   };
 
   return (
@@ -33,20 +52,32 @@ const RegistroConsumo = () => {
       <h2>🛠 Registro de Consumo</h2>
       <form onSubmit={handleSubmit}>
         <label>ID del Cliente:</label>
-        <input
-          type="text"
-          name="clienteId"
-          value={consumo.clienteId}
-          onChange={handleChange}
-          required
-          placeholder="Ingrese ID del cliente"
-        />
+        <select name="clienteId" value={consumo.clienteId} onChange={handleChange} required>
+          <option value="">Seleccione un cliente</option>
+          {clientesRegistrados.map((cliente, index) => (
+            <option key={index} value={cliente}>
+              {cliente}
+            </option>
+          ))}
+        </select>
+
+        <label>Placa del Vehículo:</label>
+        <select name="placaVehiculo" value={consumo.placaVehiculo} onChange={handleChange} required>
+          <option value="">Seleccione una placa</option>
+          {placasVehiculos.map((placa, index) => (
+            <option key={index} value={placa}>
+              {placa}
+            </option>
+          ))}
+        </select>
 
         <label>Servicio:</label>
         <select name="servicio" value={consumo.servicio} onChange={handleChange} required>
           <option value="">Seleccione un servicio</option>
           {serviciosDisponibles.map((servicio, index) => (
-            <option key={index} value={servicio}>{servicio}</option>
+            <option key={index} value={servicio}>
+              {servicio}
+            </option>
           ))}
         </select>
 

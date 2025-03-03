@@ -5,7 +5,6 @@ import "chart.js/auto";
 import "./Home.css";
 
 const Home = () => {
-  // Datos simulados para el dashboard
   const metrics = {
     clientes: 50,
     vehiculos: 75,
@@ -20,7 +19,6 @@ const Home = () => {
     "📅 12:30 PM - Cita agendada: XYZ456",
   ];
 
-  // Datos para el gráfico de servicios
   const dataServicios = {
     labels: ["Cambio de Aceite", "Alineación", "Revisión General", "Frenos"],
     datasets: [
@@ -34,47 +32,49 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      {/* Encabezado */}
-      <div className="header">
-        <img src="/TallerTechLogo3.png" alt="Logo TallerTech" className="logo" />
-        <h1>Bienvenido a TallerTech</h1>
-        <p>📅 {new Date().toLocaleDateString()}</p>
-      </div>
-
-      {/* Sección de métricas */}
-      <div className="metricas">
-        <div className="card">🚗 <strong>Clientes:</strong> {metrics.clientes}</div>
-        <div className="card">🚙 <strong>Vehículos:</strong> {metrics.vehiculos}</div>
-        <div className="card">⚙️ <strong>Servicios Pendientes:</strong> {metrics.serviciosPendientes}</div>
-        <div className="card">📅 <strong>Citas Hoy:</strong> {metrics.citasHoy}</div>
-        <div className="card">💰 <strong>Ingresos Mes:</strong> ${metrics.ingresosMes}</div>
-      </div>
-
-      {/* Gráfico de servicios */}
-      <div className="grafico-container">
-        <h3>📊 Servicios Realizados</h3>
-        <Bar data={dataServicios} />
-      </div>
-
-      {/* Acciones rápidas */}
-      <div className="acciones-rapidas">
-        <h3>🚀 Acciones Rápidas</h3>
-        <div className="acciones-botones">
-          <Link to="/registro-cliente" className="btn">➕ Registrar Cliente</Link>
-          <Link to="/agendar-cita" className="btn">📅 Agendar Cita</Link>
-          <Link to="/diagnostico-vehiculo" className="btn">🔧 Diagnóstico</Link>
-          <Link to="/facturacion" className="btn">💳 Generar Factura</Link>
+      <div className="contenido">
+        {/* Encabezado */}
+        <div className="header">
+          <img src="/TallerTechLogo3.png" alt="Logo TallerTech" className="logo" />
+          <h1>Bienvenido a TallerTech</h1>
+          <p>📅 {new Date().toLocaleDateString()}</p>
         </div>
-      </div>
 
-      {/* Actividades Recientes */}
-      <div className="actividades">
-        <h3>🕒 Actividades Recientes</h3>
-        <ul>
-          {actividadesRecientes.map((actividad, index) => (
-            <li key={index}>{actividad}</li>
-          ))}
-        </ul>
+        {/* Sección de métricas */}
+        <div className="metricas">
+          <div className="card">🚗 <strong>Clientes:</strong> {metrics.clientes}</div>
+          <div className="card">🚙 <strong>Vehículos:</strong> {metrics.vehiculos}</div>
+          <div className="card">⚙️ <strong>Servicios Pendientes:</strong> {metrics.serviciosPendientes}</div>
+          <div className="card">📅 <strong>Citas Hoy:</strong> {metrics.citasHoy}</div>
+          <div className="card">💰 <strong>Ingresos Mes:</strong> ${metrics.ingresosMes}</div>
+        </div>
+
+        {/* Gráfico de servicios */}
+        <div className="grafico-container">
+          <h3>📊 Servicios Realizados</h3>
+          <Bar data={dataServicios} />
+        </div>
+
+        {/* Acciones rápidas */}
+        <div className="acciones-rapidas">
+          <h3>🚀 Acciones Rápidas</h3>
+          <div className="acciones-botones">
+            <Link to="/registro-cliente" className="btn">➕ Registrar Cliente</Link>
+            <Link to="/agendar-cita" className="btn">📅 Agendar Cita</Link>
+            <Link to="/diagnostico-vehiculo" className="btn">🔧 Diagnóstico</Link>
+            <Link to="/facturacion" className="btn">💳 Generar Factura</Link>
+          </div>
+        </div>
+
+        {/* Actividades Recientes */}
+        <div className="actividades">
+          <h3>🕒 Actividades Recientes</h3>
+          <ul>
+            {actividadesRecientes.map((actividad, index) => (
+              <li key={index}>{actividad}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

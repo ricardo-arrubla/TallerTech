@@ -36,8 +36,10 @@ const Navbar = () => {
         <Link to="/perfil-taller">🏪 Perfil Taller</Link>
         <Link to="/facturacion">💰 Facturación</Link>
         <Link to="/agendar-cita">📅 Agendar Cita</Link>
+      </div>
 
-        {/* Botón de Cerrar Sesión */}
+      {/* Botón de Cerrar Sesión en otra parte */}
+      <div className="logout-section">
         <button className="logout-btn" onClick={handleLogout}>
           🚪 Cerrar Sesión
         </button>
