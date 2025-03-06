@@ -20,6 +20,9 @@ const Clientes = () => {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [clienteEditando, setClienteEditando] = useState(null);
 
+  // Estado para mostrar detalles del cliente
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+
   // Filtrar clientes
   const clientesFiltrados = clientes.filter((c) =>
     c[filtro].toLowerCase().includes(busqueda.toLowerCase()) &&
@@ -48,6 +51,16 @@ const Clientes = () => {
     if (window.confirm("¿Seguro que deseas eliminar este cliente?")) {
       setClientes(clientes.filter((c) => c.id !== id));
     }
+  };
+
+  // Mostrar detalles del cliente
+  const verDetallesCliente = (cliente) => {
+    setClienteSeleccionado(cliente);
+  };
+
+  // Cerrar el modal de detalles
+  const cerrarDetalles = () => {
+    setClienteSeleccionado(null);
   };
 
   // Datos para el gráfico de clientes activos e inactivos
@@ -114,7 +127,7 @@ const Clientes = () => {
                 <td>{c.vehiculos}</td>
                 <td className={`estado ${c.estado.toLowerCase()}`}>{c.estado}</td>
                 <td>
-                  <button className="btn-ver">👁 Ver</button>
+                  <button className="btn-ver" onClick={() => verDetallesCliente(c)}>👁 Ver</button>
                   <button className="btn-editar" onClick={() => abrirModalEdicion(c)}>✏ Editar</button>
                   <button className="btn-eliminar" onClick={() => eliminarCliente(c.id)}>🗑 Eliminar</button>
                 </td>
@@ -156,6 +169,22 @@ const Clientes = () => {
 
             <button className="guardar-btn" onClick={guardarEdicion}>💾 Guardar Cambios</button>
             <button className="cerrar-btn" onClick={() => setModalAbierto(false)}>❌ Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalles del Cliente */}
+      {clienteSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>👤 Detalles del Cliente</h3>
+            <p><strong>ID:</strong> {clienteSeleccionado.id}</p>
+            <p><strong>Nombre:</strong> {clienteSeleccionado.nombre}</p>
+            <p><strong>Teléfono:</strong> {clienteSeleccionado.telefono}</p>
+            <p><strong>Correo:</strong> {clienteSeleccionado.correo}</p>
+            <p><strong>Vehículos:</strong> {clienteSeleccionado.vehiculos}</p>
+            <p><strong>Estado:</strong> {clienteSeleccionado.estado}</p>
+            <button className="cerrar-btn" onClick={cerrarDetalles}>❌ Cerrar</button>
           </div>
         </div>
       )}

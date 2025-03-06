@@ -38,7 +38,7 @@ const Navbar = () => {
         <Link to="/agendar-cita">📅 Agendar Cita</Link>
       </div>
 
-      {/* Botón de Cerrar Sesión en otra parte */}
+      {/* Botón de Cerrar Sesión */}
       <div className="logout-section">
         <button className="logout-btn" onClick={handleLogout}>
           🚪 Cerrar Sesión

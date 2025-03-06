@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./Facturacion.css";
@@ -26,10 +26,21 @@ const Facturacion = () => {
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
   const [numFactura, setNumFactura] = useState("001");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
+  const [inspeccion, setInspeccion] = useState(null); // Resultados de la inspección
+
+  // Cargar inspección desde localStorage al cargar el componente
+  useEffect(() => {
+    const inspeccionGuardada = localStorage.getItem("inspeccion");
+    if (inspeccionGuardada) {
+      setInspeccion(JSON.parse(inspeccionGuardada));
+    }
+  }, []);
 
   // Agregar servicio a la factura
   const agregarServicio = (servicio) => {
-    setServiciosSeleccionados([...serviciosSeleccionados, servicio]);
+    if (!serviciosSeleccionados.some((s) => s.nombre === servicio.nombre)) {
+      setServiciosSeleccionados([...serviciosSeleccionados, servicio]);
+    }
   };
 
   // Eliminar servicio de la factura
@@ -50,23 +61,48 @@ const Facturacion = () => {
     }
 
     const doc = new jsPDF();
+    doc.setFontSize(18);
     doc.text("Factura de Servicios", 14, 10);
+
+    doc.setFontSize(12);
     doc.text(`Factura No: ${numFactura}`, 14, 20);
     doc.text(`Fecha: ${fecha}`, 14, 30);
     doc.text(`Cliente: ${clienteSeleccionado}`, 14, 40);
     doc.text(`Vehículo: ${vehiculoSeleccionado}`, 14, 50);
-    
+
+    // Mostrar resultados de la inspección
+    let yPos = 60; // Posición inicial para los resultados
+    if (inspeccion) {
+      doc.text("Resultados de la Inspección:", 14, yPos);
+      yPos += 5;
+      Object.entries(inspeccion).forEach(([parte, estado]) => {
+        doc.setFontSize(10);
+        doc.text(`${parte}: ${estado}`, 14, yPos);
+        yPos += 5; // Incrementar posición vertical
+      });
+      doc.setFontSize(12);
+    }
+
+    // Tabla de servicios
     doc.autoTable({
-      startY: 60,
+      startY: yPos + 5,
       head: [["Servicio", "Precio ($)"]],
       body: serviciosSeleccionados.map((servicio) => [servicio.nombre, `$${servicio.precio}`]),
     });
 
+    // Totales
     doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 10);
     doc.text(`Impuestos (16%): $${impuestos.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 20);
     doc.text(`Total: $${total.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 30);
 
-    doc.save(`Factura_${numFactura}.pdf`);
+    // Guardar PDF
+    try {
+      doc.save(`Factura_${numFactura}.pdf`);
+      alert("Factura generada correctamente.");
+    } catch (error) {
+      console.error("Error al generar el PDF:", error);
+      alert("Ocurrió un error al generar la factura. Por favor, inténtalo de nuevo.");
+    }
   };
 
   return (
@@ -92,6 +128,20 @@ const Facturacion = () => {
           ))}
         </select>
       </div>
+
+      {/* Resultados de la Inspección */}
+      {inspeccion && (
+        <div className="inspeccion-resultados">
+          <h3>🔍 Resultados de la Inspección</h3>
+          <ul>
+            {Object.entries(inspeccion).map(([parte, estado], index) => (
+              <li key={index}>
+                <strong>{parte}:</strong> {estado}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Selección de Servicios */}
       <div className="servicios-lista">

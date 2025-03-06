@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./InspeccionVehiculo.css";
 
 const InspeccionVehiculo = () => {
@@ -25,25 +25,38 @@ const InspeccionVehiculo = () => {
     }, {})
   );
 
+  // Hook de navegación
+  const navigate = useNavigate();
+
   // Manejar cambios en la selección de estado
   const handleSelectChange = (parte, estado) => {
     setInspeccion({ ...inspeccion, [parte]: estado });
   };
 
+  // Validar que todas las partes estén inspeccionadas
+  const isInspeccionCompleta = () => {
+    return partesVehiculo.every((parte) => inspeccion[parte] !== "");
+  };
+
   // Guardar la inspección y redirigir al diagnóstico
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Inspección registrada:", inspeccion);
-    alert("Inspección registrada correctamente ✅");
+  const handleSiguiente = () => {
+    if (!isInspeccionCompleta()) {
+      alert("Por favor, completa la inspección de todas las partes antes de continuar.");
+      return;
+    }
 
     // Guardar en localStorage
     localStorage.setItem("inspeccion", JSON.stringify(inspeccion));
+    console.log("Inspección registrada:", inspeccion);
+
+    // Redirigir al diagnóstico
+    navigate("/diagnostico-vehiculo");
   };
 
   return (
     <div className="inspeccion-container">
       <h2>🔍 Inspección del Vehículo</h2>
-      <form onSubmit={handleSubmit}>
+      <form>
         <table>
           <thead>
             <tr>
@@ -72,18 +85,17 @@ const InspeccionVehiculo = () => {
             ))}
           </tbody>
         </table>
-        <button type="submit">Guardar Inspección</button>
-        <button onClick={() => navigate("/diagnostico")} className="btn-siguiente">
-        Siguiente ➡
-      </button>
-      </form>
 
-      {/* Botón para ir al Diagnóstico */}
-      <div className="navegacion">
-        <Link to="/diagnostico-vehiculo">
-          <button>Ir a Diagnóstico</button>
-        </Link>
-      </div>
+        {/* Botón Siguiente */}
+        <button
+          type="button"
+          onClick={handleSiguiente}
+          disabled={!isInspeccionCompleta()}
+          className="btn-siguiente"
+        >
+          Siguiente ➡
+        </button>
+      </form>
     </div>
   );
 };
