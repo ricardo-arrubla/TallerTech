@@ -31,6 +31,24 @@ const Registro = () => {
             <p>Registre un servicio realizado en el taller.</p>
           </div>
         </Link>
+
+        {/* 📋 Botón para Historial de Servicios */}
+        <Link to="/historial-servicios" className="registro-card historial">
+          <div>
+            <i className="fas fa-file-alt"></i>
+            <h3>Historial de Servicios</h3>
+            <p>Consulte el historial de servicios registrados.</p>
+          </div>
+        </Link>
+
+        {/* 📊 Botón para Reports */}
+        <Link to="/reportes" className="registro-card reportes">
+          <div>
+            <i className="fas fa-chart-bar"></i>
+            <h3>Reportes</h3>
+            <p>Vea reportes y estadísticas del taller.</p>
+          </div>
+        </Link>
       </div>
     </div>
   );
