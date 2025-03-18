@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./AgendarCita.css";
+import "./Estilos/AgendarCita.css";
 
 const AgendarCita = () => {
   // Estado para la cita

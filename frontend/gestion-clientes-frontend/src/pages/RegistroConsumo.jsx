@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./RegistroConsumo.css";
+import "./Estilos/RegistroConsumo.css";
 
 const RegistroConsumo = () => {
   const [consumo, setConsumo] = useState({

@@ -1,0 +1,18 @@
+.totalizador {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .totalizador p {
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .totalizador h3 {
+    font-size: 20px;
+    color: #8b0000;
+  }
+  

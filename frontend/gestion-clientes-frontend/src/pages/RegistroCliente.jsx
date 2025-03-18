@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./RegistroCliente.css"; // Asegúrate de crear un archivo de estilos
+import "./Estilos/RegistroCliente.css"; // Asegúrate de crear un archivo de estilos
 
 const RegistroCliente = () => {
   const [cliente, setCliente] = useState({

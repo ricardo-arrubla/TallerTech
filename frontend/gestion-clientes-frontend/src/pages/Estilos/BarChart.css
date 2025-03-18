@@ -1,0 +1,13 @@
+.bar-chart {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    text-align: center;
+  }
+  
+  .bar-chart h3 {
+    color: #8b0000;
+  }
+  

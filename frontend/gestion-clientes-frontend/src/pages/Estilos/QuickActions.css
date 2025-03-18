@@ -1,0 +1,23 @@
+.quick-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .quick-action-btn {
+    background-color: #8b0000;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .quick-action-btn:hover {
+    background-color: #d9534f;
+  }
+  

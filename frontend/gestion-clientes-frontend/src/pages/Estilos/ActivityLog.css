@@ -1,0 +1,23 @@
+.activity-log {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  
+  .activity-log h3 {
+    color: #8b0000;
+  }
+  
+  .activity-log ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .activity-log li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+  }
+  

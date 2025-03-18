@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./Registro.css";
+import "./Estilos/Registro.css";
 
 const Registro = () => {
   return (

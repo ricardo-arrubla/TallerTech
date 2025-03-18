@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./RegistroVehiculo.css"; // Asegúrate de crear un archivo de estilos
+import "./Estilos/RegistroVehiculo.css"; // Asegúrate de crear un archivo de estilos
 
 const RegistroVehiculo = () => {
   const [vehiculo, setVehiculo] = useState({

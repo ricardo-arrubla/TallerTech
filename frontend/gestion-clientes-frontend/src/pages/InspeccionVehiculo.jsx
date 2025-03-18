@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./InspeccionVehiculo.css";
+import "./Estilos/InspeccionVehiculo.css";
 
 const InspeccionVehiculo = () => {
   // Lista de partes a inspeccionar

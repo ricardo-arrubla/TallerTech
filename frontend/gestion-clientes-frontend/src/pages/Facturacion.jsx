@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "./Facturacion.css";
+import "./Estilos/Facturacion.css";
 
 const Facturacion = () => {
   // Lista de clientes y vehículos (simulados)

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
-import "./Consulta.css";
+import "./Estilos/Consulta.css";
 
 const Consulta = () => {
   // Datos de consumos (Simulados)

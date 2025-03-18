@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
-import "./Home.css";
+import "./Estilos/Home.css";
 
 const Home = () => {
   const metrics = {

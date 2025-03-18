@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./PerfilTaller.css";
+import "./Estilos/PerfilTaller.css";
 
 const PerfilTaller = () => {
   // Estado para almacenar los datos del dueño del taller

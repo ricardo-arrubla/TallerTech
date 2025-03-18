@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"; // 👈 Asegurar que `React` y los hooks se importen correctamente
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import "./Reports.css";
+import "./Estilos/Reports.css";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 

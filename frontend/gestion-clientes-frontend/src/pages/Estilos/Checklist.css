@@ -1,0 +1,17 @@
+.checklist {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .checklist label {
+    display: block;
+    padding: 5px;
+    cursor: pointer;
+  }
+  
+  .checklist input {
+    margin-right: 8px;
+  }
+  

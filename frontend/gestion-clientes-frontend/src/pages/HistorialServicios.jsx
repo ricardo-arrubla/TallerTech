@@ -1,7 +1,7 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "./HistorialServicios.css";
+import "./Estilos/HistorialServicios.css";
 
 const HistorialServicios = () => {
   // Datos simulados de servicios

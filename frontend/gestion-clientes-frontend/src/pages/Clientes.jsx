@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
-import "./Clientes.css";
+import "./Estilos/Clientes.css";
 
 const Clientes = () => {
   // Datos de clientes (Simulados)
