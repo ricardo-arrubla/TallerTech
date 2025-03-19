@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types"; // Para validación de props
 import "./Estilos/FormularioRegistro.css";
 
-const FormularioRegistro = ({ tipo, campos, opciones, onSubmit }) => {
+const FormularioRegistro = ({ tipo, campos, opciones, onSubmit, extraFields }) => {
   // Estado inicial basado en los campos recibidos
   const estadoInicial = campos.reduce((acc, campo) => {
     acc[campo.name] = campo.defaultValue || "";
@@ -57,6 +57,9 @@ const FormularioRegistro = ({ tipo, campos, opciones, onSubmit }) => {
           </div>
         ))}
 
+        {/* Agregar campos adicionales si se proporcionan */}
+        {extraFields && extraFields()}
+
         <button type="submit">Registrar {tipo}</button>
       </form>
     </div>
@@ -77,10 +80,12 @@ FormularioRegistro.propTypes = {
   ).isRequired,
   opciones: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
+  extraFields: PropTypes.func, // Prop opcional para campos adicionales
 };
 
 FormularioRegistro.defaultProps = {
   opciones: {},
+  extraFields: null,
 };
 
 export default FormularioRegistro;

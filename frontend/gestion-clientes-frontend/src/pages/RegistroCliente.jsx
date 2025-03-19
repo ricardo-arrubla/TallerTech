@@ -1,13 +1,18 @@
 import { useState } from "react";
-import "./Estilos/RegistroCliente.css"; // Asegúrate de crear un archivo de estilos
+import "./Estilos/RegistroCliente.css";
 import FormularioRegistro from "./FormularioRegistro";
 
 const RegistroCliente = () => {
   const handleSubmit = (data) => {
-    console.log("Cliente registrado:", data);
-
-    // Guardar el cliente en localStorage
     const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
+
+    // Validar que el ID no exista
+    if (clientesGuardados.some((cliente) => cliente.id === data.id)) {
+      alert("El ID ya está registrado. Por favor, use otro.");
+      return;
+    }
+
+    // Guardar el cliente
     clientesGuardados.push({ id: data.id, nombre: data.nombre });
     localStorage.setItem("clientes", JSON.stringify(clientesGuardados));
 
@@ -20,12 +25,7 @@ const RegistroCliente = () => {
       campos={[
         { name: "nombre", label: "Nombre", type: "text", placeholder: "Ingrese su nombre" },
         { name: "id", label: "ID", type: "text", placeholder: "Ingrese su ID" },
-        { name: "placa", label: "Placa del Carro", type: "text", placeholder: "Ingrese la placa" },
-        { name: "marca", label: "Marca del Carro", type: "select", defaultValue: "Chevrolet" },
       ]}
-      opciones={{
-        marca: ["Chevrolet", "Tesla", "Toyota", "Ford", "Honda"],
-      }}
       onSubmit={handleSubmit}
     />
   );

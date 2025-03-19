@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./Estilos/RegistroVehiculo.css"; // Asegúrate de tener este archivo
+import "./Estilos/RegistroVehiculo.css";
 import FormularioRegistro from "./FormularioRegistro";
 
 const RegistroVehiculo = () => {
@@ -24,19 +24,59 @@ const RegistroVehiculo = () => {
   };
 
   const handleSubmit = (data) => {
-    if (clienteSeleccionado === "" && nuevoCliente === "") {
+    let clienteFinal;
+
+    if (clienteSeleccionado !== "") {
+      clienteFinal = clienteSeleccionado;
+    } else if (nuevoCliente !== "") {
+      // Crear un nuevo cliente
+      const nuevoId = nuevoCliente;
+      const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
+
+      if (clientesGuardados.some((cliente) => cliente.id === nuevoId)) {
+        alert("El ID ya está registrado. Por favor, use otro.");
+        return;
+      }
+
+      clientesGuardados.push({ id: nuevoId, nombre: nuevoId });
+      localStorage.setItem("clientes", JSON.stringify(clientesGuardados));
+      clienteFinal = nuevoId;
+    } else {
       alert("Por favor, seleccione un cliente existente o ingrese un nuevo ID.");
       return;
     }
 
-    const clienteFinal = clienteSeleccionado !== "" ? clienteSeleccionado : nuevoCliente;
+    // Guardar el vehículo
+    const vehiculosGuardados = JSON.parse(localStorage.getItem("vehiculos")) || [];
+    vehiculosGuardados.push({ ...data, clienteId: clienteFinal });
+    localStorage.setItem("vehiculos", JSON.stringify(vehiculosGuardados));
 
-    // Guardar el vehículo asociado al cliente
-    console.log("Vehículo registrado:", { ...data, clienteId: clienteFinal });
-
-    // Opcional: Guardar en localStorage o enviar al backend
     alert(`Vehículo registrado con éxito para el cliente ID: ${clienteFinal}`);
   };
+
+  const renderExtraFields = () => (
+    <div className="cliente-seleccion">
+      <label>ID Cliente:</label>
+      <select name="clienteId" value={clienteSeleccionado} onChange={handleClienteChange} required>
+        <option value="">Seleccione un cliente</option>
+        {clientesRegistrados.map((cliente) => (
+          <option key={cliente.id} value={cliente.id}>
+            {cliente.nombre} (ID: {cliente.id})
+          </option>
+        ))}
+        <option value="nuevo">Registrar nuevo cliente</option>
+      </select>
+      {clienteSeleccionado === "" && (
+        <input
+          type="text"
+          placeholder="Ingrese ID del nuevo cliente"
+          value={nuevoCliente}
+          onChange={(e) => setNuevoCliente(e.target.value)}
+          required
+        />
+      )}
+    </div>
+  );
 
   return (
     <FormularioRegistro
@@ -50,35 +90,7 @@ const RegistroVehiculo = () => {
       opciones={{
         marca: ["Chevrolet", "Tesla", "Toyota", "Ford", "Honda", "BMW", "Mercedes-Benz", "Audi"],
       }}
-      extraCampos={
-        <div className="cliente-seleccion">
-          <label>ID Cliente:</label>
-          <select name="clienteId" value={clienteSeleccionado} onChange={handleClienteChange} required>
-            <option value="">Seleccione un cliente</option>
-            {clientesRegistrados.length > 0 ? (
-              clientesRegistrados.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nombre} (ID: {cliente.id})
-                </option>
-              ))
-            ) : (
-              <option value="">No hay clientes registrados</option>
-            )}
-            <option value="nuevo">Registrar un nuevo cliente</option>
-          </select>
-
-          {clienteSeleccionado === "" && (
-            <input
-              type="text"
-              name="nuevoCliente"
-              value={nuevoCliente}
-              onChange={(e) => setNuevoCliente(e.target.value)}
-              placeholder="Ingrese el ID del nuevo cliente"
-              required
-            />
-          )}
-        </div>
-      }
+      extraFields={renderExtraFields}
       onSubmit={handleSubmit}
     />
   );
