@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import "./Estilos/Consulta.css";
+import Modal from "./Reutilizables/Modal";
+import FormularioRegistro from "./FormularioRegistro";
 
 const Consulta = () => {
   // Datos de consumos (Simulados)
@@ -21,15 +23,24 @@ const Consulta = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [consumoEditando, setConsumoEditando] = useState(null);
 
+  // Estado para el modal de registro de nuevo servicio
+  const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
+
   // Filtrar consumos según búsqueda y estado
-  const consumosFiltrados = consumos.filter((c) => 
+  const consumosFiltrados = consumos.filter((c) =>
     c[filtro].toLowerCase().includes(busqueda.toLowerCase()) &&
     (estadoFiltro === "Todos" || c.estado === estadoFiltro)
   );
 
   // Función para ver detalles de un consumo
   const handleVer = (consumo) => {
-    alert(`Detalles del consumo:\n\nCliente: ${consumo.cliente}\nPlaca: ${consumo.placa}\nServicio: ${consumo.servicio}\nFecha: ${consumo.fecha}\nEstado: ${consumo.estado}\nPrecio: $${consumo.precio}`);
+    alert(`Detalles del consumo:
+Cliente: ${consumo.cliente}
+Placa: ${consumo.placa}
+Servicio: ${consumo.servicio}
+Fecha: ${consumo.fecha}
+Estado: ${consumo.estado}
+Precio: $${consumo.precio}`);
   };
 
   // Función para abrir el modal de edición
@@ -54,6 +65,22 @@ const Consulta = () => {
       )
     );
     setModalVisible(false); // Cerrar el modal después de guardar
+  };
+
+  // Función para agregar un nuevo servicio
+  const agregarServicio = (nuevoServicio) => {
+    const nuevoId = String(consumos.length + 1).padStart(3, "0"); // Generar ID único
+    const nuevoConsumo = {
+      id: nuevoId,
+      cliente: nuevoServicio.clienteId,
+      placa: nuevoServicio.placaVehiculo,
+      servicio: nuevoServicio.servicio,
+      precio: nuevoServicio.costo,
+      fecha: nuevoServicio.fecha,
+      estado: "Pendiente", // Por defecto, el estado es "Pendiente"
+    };
+    setConsumos([...consumos, nuevoConsumo]);
+    setMostrarModalRegistro(false); // Cerrar el modal después de agregar
   };
 
   // Calcular total de gastos por cliente
@@ -81,6 +108,11 @@ const Consulta = () => {
     <div className="consulta-container">
       <h2>📊 Consulta de Consumos</h2>
       <p>Revisa el historial de consumos y servicios realizados en el taller.</p>
+
+      {/* Botón para añadir un nuevo servicio */}
+      <button className="btn-agregar" onClick={() => setMostrarModalRegistro(true)}>
+        ➕ Añadir Servicio
+      </button>
 
       {/* Barra de búsqueda y filtros */}
       <div className="busqueda-container">
@@ -222,6 +254,28 @@ const Consulta = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Modal para registrar un nuevo servicio */}
+      {mostrarModalRegistro && (
+        <Modal title="Registrar Nuevo Servicio" onClose={() => setMostrarModalRegistro(false)}>
+          <FormularioRegistro
+            tipo="Registrar Servicio"
+            campos={[
+              { name: "clienteId", label: "ID Cliente", type: "select" },
+              { name: "placaVehiculo", label: "Placa Vehículo", type: "select" },
+              { name: "servicio", label: "Servicio", type: "select" },
+              { name: "costo", label: "Costo ($)", type: "number", placeholder: "Ingrese el costo" },
+              { name: "fecha", label: "Fecha", type: "date" },
+            ]}
+            opciones={{
+              clienteId: ["C001", "C002", "C003"],
+              placaVehiculo: ["ABC123", "XYZ456", "DEF789"],
+              servicio: ["Cambio de Aceite", "Alineación", "Revisión de Frenos"],
+            }}
+            onSubmit={agregarServicio}
+          />
+        </Modal>
       )}
 
       {/* Gráfico de gastos por cliente */}

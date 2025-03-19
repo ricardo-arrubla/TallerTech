@@ -1,7 +1,7 @@
 /* 🌟 Contenedor Principal */
 .registro-vehiculo-container {
   max-width: 500px;
-  margin: 0 auto; /* Centrado horizontal */
+  margin: 0 auto;
   padding: 30px;
   background-color: #ffffff;
   border-radius: 15px;
@@ -43,6 +43,7 @@ select {
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.3s ease;
+  width: 100%;
 }
 
 input:focus,
@@ -50,6 +51,31 @@ select:focus {
   border-color: #8b0000;
   outline: none;
   box-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+}
+
+/* 🔽 Selector de Cliente */
+.cliente-seleccion {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+}
+
+.cliente-dropdown {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+}
+
+.cliente-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 10px;
 }
 
 /* 🛠 Botones */
@@ -92,4 +118,22 @@ label {
   select {
     font-size: 14px;
   }
+}
+
+.cliente-seleccion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cliente-seleccion select,
+.cliente-seleccion input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.nuevo-cliente {
+  margin-top: 10px;
 }

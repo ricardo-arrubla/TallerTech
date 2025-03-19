@@ -11,18 +11,25 @@ const Facturacion = () => {
     { id: "003", nombre: "Carlos López", vehiculo: "Ford Focus - LMN456" },
   ];
 
-  // Lista de servicios con precios
-  const serviciosDisponibles = [
-    { nombre: "Cambio de Aceite", precio: 30 },
-    { nombre: "Alineación y Balanceo", precio: 50 },
-    { nombre: "Cambio de Filtros", precio: 40 },
-    { nombre: "Revisión General", precio: 80 },
-    { nombre: "Cambio de Batería", precio: 100 },
-  ];
+  // Simulación de servicios asociados a cada vehículo (podría provenir de una API o localStorage)
+  const serviciosPorVehiculo = {
+    "ABC123": [
+      { nombre: "Cambio de Aceite", precio: 30 },
+      { nombre: "Alineación y Balanceo", precio: 50 },
+    ],
+    "XYZ789": [
+      { nombre: "Cambio de Filtros", precio: 40 },
+      { nombre: "Revisión General", precio: 80 },
+    ],
+    "LMN456": [
+      { nombre: "Cambio de Batería", precio: 100 },
+    ],
+  };
 
   // Estados
   const [clienteSeleccionado, setClienteSeleccionado] = useState("");
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState("");
+  const [serviciosAsociados, setServiciosAsociados] = useState([]); // Servicios autocompletados
   const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
   const [numFactura, setNumFactura] = useState("001");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
@@ -35,6 +42,14 @@ const Facturacion = () => {
       setInspeccion(JSON.parse(inspeccionGuardada));
     }
   }, []);
+
+  // Autocompletar servicios al seleccionar un vehículo
+  const seleccionarVehiculo = (placa) => {
+    setVehiculoSeleccionado(placa);
+    const servicios = serviciosPorVehiculo[placa] || [];
+    setServiciosAsociados(servicios);
+    setServiciosSeleccionados([]); // Limpiar servicios seleccionados al cambiar de vehículo
+  };
 
   // Agregar servicio a la factura
   const agregarServicio = (servicio) => {
@@ -121,10 +136,12 @@ const Facturacion = () => {
         </select>
 
         <label>🚗 Vehículo:</label>
-        <select onChange={(e) => setVehiculoSeleccionado(e.target.value)}>
+        <select onChange={(e) => seleccionarVehiculo(e.target.value.split(" - ")[1])}>
           <option value="">Seleccione Vehículo</option>
           {clientes.map((c) => (
-            <option key={c.id} value={c.vehiculo}>{c.vehiculo}</option>
+            <option key={c.id} value={`${c.nombre} - ${c.vehiculo.split(" - ")[1]}`}>
+              {c.vehiculo}
+            </option>
           ))}
         </select>
       </div>
@@ -143,15 +160,21 @@ const Facturacion = () => {
         </div>
       )}
 
-      {/* Selección de Servicios */}
-      <div className="servicios-lista">
-        <h3>📌 Seleccionar Servicios</h3>
-        {serviciosDisponibles.map((servicio, index) => (
-          <button key={index} onClick={() => agregarServicio(servicio)}>
-            ➕ {servicio.nombre} - ${servicio.precio}
-          </button>
-        ))}
-      </div>
+      {/* Servicios Asociados al Vehículo */}
+      {vehiculoSeleccionado && (
+        <div className="servicios-asociados">
+          <h3>🔧 Servicios Asociados al Vehículo</h3>
+          {serviciosAsociados.length > 0 ? (
+            serviciosAsociados.map((servicio, index) => (
+              <button key={index} onClick={() => agregarServicio(servicio)}>
+                ➕ {servicio.nombre} - ${servicio.precio}
+              </button>
+            ))
+          ) : (
+            <p>No hay servicios asociados a este vehículo.</p>
+          )}
+        </div>
+      )}
 
       {/* Tabla de Factura */}
       <h3>🛠 Servicios Seleccionados</h3>

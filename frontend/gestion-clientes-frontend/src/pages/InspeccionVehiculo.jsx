@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Estilos/InspeccionVehiculo.css";
 
 const InspeccionVehiculo = () => {
-  // Lista de partes a inspeccionar
   const partesVehiculo = [
     "Luces delanteras",
     "Luces traseras",
@@ -17,45 +16,45 @@ const InspeccionVehiculo = () => {
     "Sistema de escape",
   ];
 
-  // Estado para cada parte del vehículo
-  const [inspeccion, setInspeccion] = useState(
-    partesVehiculo.reduce((estado, parte) => {
-      estado[parte] = "";
-      return estado;
-    }, {})
-  );
+  // 🚗 Cargar datos desde localStorage al montar el componente
+  const [inspeccion, setInspeccion] = useState(() => {
+    const inspeccionGuardada = localStorage.getItem("inspeccion");
+    return inspeccionGuardada
+      ? JSON.parse(inspeccionGuardada)
+      : partesVehiculo.reduce((estado, parte) => {
+          estado[parte] = "";
+          return estado;
+        }, {});
+  });
 
-  // Hook de navegación
   const navigate = useNavigate();
 
-  // Manejar cambios en la selección de estado
+  // 🛠 Manejar cambios en la selección y guardar en localStorage en tiempo real
   const handleSelectChange = (parte, estado) => {
-    setInspeccion({ ...inspeccion, [parte]: estado });
+    const nuevaInspeccion = { ...inspeccion, [parte]: estado };
+    setInspeccion(nuevaInspeccion);
+    localStorage.setItem("inspeccion", JSON.stringify(nuevaInspeccion));
   };
 
-  // Validar que todas las partes estén inspeccionadas
-  const isInspeccionCompleta = () => {
-    return partesVehiculo.every((parte) => inspeccion[parte] !== "");
-  };
+  // ✅ Validar progreso
+  const partesCompletadas = Object.values(inspeccion).filter((estado) => estado !== "").length;
+  const totalPartes = partesVehiculo.length;
+  const isInspeccionCompleta = partesCompletadas === totalPartes;
 
-  // Guardar la inspección y redirigir al diagnóstico
+  // 🚀 Guardar y continuar al diagnóstico
   const handleSiguiente = () => {
-    if (!isInspeccionCompleta()) {
-      alert("Por favor, completa la inspección de todas las partes antes de continuar.");
-      return;
+    if (!isInspeccionCompleta) {
+      if (!window.confirm("🚨 Aún hay partes sin inspeccionar. ¿Desea continuar de todos modos?")) {
+        return;
+      }
     }
-
-    // Guardar en localStorage
-    localStorage.setItem("inspeccion", JSON.stringify(inspeccion));
-    console.log("Inspección registrada:", inspeccion);
-
-    // Redirigir al diagnóstico
     navigate("/diagnostico-vehiculo");
   };
 
   return (
     <div className="inspeccion-container">
       <h2>🔍 Inspección del Vehículo</h2>
+      <p>📝 Progreso: {partesCompletadas} de {totalPartes} partes inspeccionadas</p>
       <form>
         <table>
           <thead>
@@ -87,13 +86,8 @@ const InspeccionVehiculo = () => {
         </table>
 
         {/* Botón Siguiente */}
-        <button
-          type="button"
-          onClick={handleSiguiente}
-          disabled={!isInspeccionCompleta()}
-          className="btn-siguiente"
-        >
-          Siguiente ➡
+        <button type="button" onClick={handleSiguiente} className="btn-siguiente">
+          {isInspeccionCompleta ? "✅ Completar Inspección" : "➡ Siguiente (Incompleto)"}
         </button>
       </form>
     </div>

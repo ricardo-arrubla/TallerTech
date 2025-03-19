@@ -9,11 +9,14 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useNavigate } from "react-router-dom"; // Para redirección
 import "./Estilos/DiagnosticoVehiculo.css";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const DiagnosticoVehiculo = () => {
+  const navigate = useNavigate(); // Hook para redirección
+
   // Cargar datos de inspección previa
   const [inspeccionPrev, setInspeccionPrev] = useState(null);
 
@@ -77,12 +80,9 @@ const DiagnosticoVehiculo = () => {
     datasets: [
       {
         label: "Estado",
-        data: [
-          estado.presionNeumaticos.frontalIzq === "Baja" ? 25 : 30,
-          estado.presionNeumaticos.frontalDer === "Baja" ? 25 : 30,
-          estado.presionNeumaticos.traseraIzq === "Baja" ? 25 : 30,
-          estado.presionNeumaticos.traseraDer === "Baja" ? 25 : 30,
-        ],
+        data: Object.values(estado.presionNeumaticos).map((p) =>
+          p === "Baja" ? 25 : 30
+        ),
         backgroundColor: Object.values(estado.presionNeumaticos).map((p) =>
           p === "Baja" ? "#f44336" : "#4caf50"
         ),
@@ -141,6 +141,21 @@ const DiagnosticoVehiculo = () => {
     return recomendaciones;
   };
 
+  // Manejador de redirección
+  const handleSiguiente = () => {
+    // Validar si hay problemas críticos antes de avanzar
+    const recomendaciones = getRecomendaciones();
+    if (recomendaciones.length > 0) {
+      const confirmacion = window.confirm(
+        "Hay problemas críticos detectados. ¿Desea continuar?"
+      );
+      if (!confirmacion) return;
+    }
+
+    // Redirigir a la página de facturación
+    navigate("/facturacion");
+  };
+
   return (
     <div className="diagnostico-container">
       <h2>🛠 Diagnóstico del Vehículo</h2>
@@ -161,6 +176,7 @@ const DiagnosticoVehiculo = () => {
 
       {/* Controles para seleccionar estado */}
       <div className="controles-diagnostico">
+        <h3>🔧 Estado del Vehículo</h3>
         <label>🚗 Motor:</label>
         <select value={estado.motor} onChange={(e) => handleChange("motor", e.target.value)}>
           <option value="Normal">Normal</option>
@@ -180,52 +196,32 @@ const DiagnosticoVehiculo = () => {
         </select>
 
         <label>⬤ Ruedas:</label>
-        <select
-          value={estado.presionNeumaticos.frontalIzq}
-          onChange={(e) => handleNeumaticoChange("frontalIzq", e.target.value)}
-        >
-          <option value="Normal">Frontal Izq. Normal</option>
-          <option value="Baja">Frontal Izq. Baja</option>
-        </select>
-        <select
-          value={estado.presionNeumaticos.frontalDer}
-          onChange={(e) => handleNeumaticoChange("frontalDer", e.target.value)}
-        >
-          <option value="Normal">Frontal Der. Normal</option>
-          <option value="Baja">Frontal Der. Baja</option>
-        </select>
+        {Object.keys(estado.presionNeumaticos).map((posicion) => (
+          <select
+            key={posicion}
+            value={estado.presionNeumaticos[posicion]}
+            onChange={(e) => handleNeumaticoChange(posicion, e.target.value)}
+          >
+            <option value="Normal">{`${posicion.replace(/([A-Z])/g, " $1")} Normal`}</option>
+            <option value="Baja">{`${posicion.replace(/([A-Z])/g, " $1")} Baja`}</option>
+          </select>
+        ))}
       </div>
 
       {/* Controles para editar balanceo */}
       <div className="controles-diagnostico">
-        <label>🔄 Balanceo Frontal Izq:</label>
-        <input
-          type="number"
-          step="0.1"
-          value={estado.balanceo.frontalIzq}
-          onChange={(e) => handleBalanceoChange("frontalIzq", e.target.value)}
-        />
-        <label>🔄 Balanceo Frontal Der:</label>
-        <input
-          type="number"
-          step="0.1"
-          value={estado.balanceo.frontalDer}
-          onChange={(e) => handleBalanceoChange("frontalDer", e.target.value)}
-        />
-        <label>🔄 Balanceo Trasera Izq:</label>
-        <input
-          type="number"
-          step="0.1"
-          value={estado.balanceo.traseraIzq}
-          onChange={(e) => handleBalanceoChange("traseraIzq", e.target.value)}
-        />
-        <label>🔄 Balanceo Trasera Der:</label>
-        <input
-          type="number"
-          step="0.1"
-          value={estado.balanceo.traseraDer}
-          onChange={(e) => handleBalanceoChange("traseraDer", e.target.value)}
-        />
+        <h3>🔄 Balanceo de Ruedas</h3>
+        {Object.keys(estado.balanceo).map((posicion) => (
+          <div key={posicion}>
+            <label>{`${posicion.replace(/([A-Z])/g, " $1")}:`}</label>
+            <input
+              type="number"
+              step="0.1"
+              value={estado.balanceo[posicion]}
+              onChange={(e) => handleBalanceoChange(posicion, e.target.value)}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Gráficas */}
@@ -267,7 +263,9 @@ const DiagnosticoVehiculo = () => {
           )}
         </ul>
       </div>
-      <button onClick={() => navigate("./Facturacion.jsx")} className="btn-siguiente">
+
+      {/* Botón Siguiente */}
+      <button onClick={handleSiguiente} className="btn-siguiente">
         Siguiente ➡
       </button>
     </div>
