@@ -4,80 +4,111 @@ import "jspdf-autotable";
 import "./Estilos/Facturacion.css";
 
 const Facturacion = () => {
-  // Lista de clientes y vehículos (simulados)
-  const clientes = [
-    { id: "001", nombre: "Juan Pérez", vehiculo: "Toyota Corolla - ABC123" },
-    { id: "002", nombre: "María García", vehiculo: "Honda Civic - XYZ789" },
-    { id: "003", nombre: "Carlos López", vehiculo: "Ford Focus - LMN456" },
-  ];
-
-  // Simulación de servicios asociados a cada vehículo (podría provenir de una API o localStorage)
-  const serviciosPorVehiculo = {
-    "ABC123": [
-      { nombre: "Cambio de Aceite", precio: 30 },
-      { nombre: "Alineación y Balanceo", precio: 50 },
-    ],
-    "XYZ789": [
-      { nombre: "Cambio de Filtros", precio: 40 },
-      { nombre: "Revisión General", precio: 80 },
-    ],
-    "LMN456": [
-      { nombre: "Cambio de Batería", precio: 100 },
-    ],
-  };
-
-  // Estados
+  const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState("");
+  const [vehiculosCliente, setVehiculosCliente] = useState([]);
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState("");
-  const [serviciosAsociados, setServiciosAsociados] = useState([]); // Servicios autocompletados
-  const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
+  const [serviciosAuto, setServiciosAuto] = useState([]); // Servicios de inspección/diagnóstico
+  const [serviciosManuales, setServiciosManuales] = useState([]); // Servicios añadidos
   const [numFactura, setNumFactura] = useState("001");
   const [fecha, setFecha] = useState(new Date().toISOString().split("T")[0]);
-  const [inspeccion, setInspeccion] = useState(null); // Resultados de la inspección
 
-  // Cargar inspección desde localStorage al cargar el componente
+  // 📌 Servicios predefinidos en el taller
+  const serviciosDisponibles = [
+    { nombre: "Cambio de Aceite", precio: 30 },
+    { nombre: "Alineación y Balanceo", precio: 50 },
+    { nombre: "Cambio de Filtros", precio: 40 },
+    { nombre: "Revisión General", precio: 80 },
+    { nombre: "Cambio de Batería", precio: 100 },
+    { nombre: "Cambio de Pastillas de Freno", precio: 90 },
+    { nombre: "Diagnóstico Computarizado", precio: 60 },
+    { nombre: "Reparación de Suspensión", precio: 120 },
+  ];
+
+  // 📌 Cargar clientes y sus vehículos desde `localStorage`
   useEffect(() => {
-    const inspeccionGuardada = localStorage.getItem("inspeccion");
-    if (inspeccionGuardada) {
-      setInspeccion(JSON.parse(inspeccionGuardada));
-    }
+    const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
+    setClientes(clientesGuardados);
   }, []);
 
-  // Autocompletar servicios al seleccionar un vehículo
-  const seleccionarVehiculo = (placa) => {
-    setVehiculoSeleccionado(placa);
-    const servicios = serviciosPorVehiculo[placa] || [];
-    setServiciosAsociados(servicios);
-    setServiciosSeleccionados([]); // Limpiar servicios seleccionados al cambiar de vehículo
+  // 🚗 Cargar vehículos del cliente seleccionado
+  const seleccionarCliente = (idCliente) => {
+    setClienteSeleccionado(idCliente);
+    const cliente = clientes.find((c) => c.id === idCliente);
+    setVehiculosCliente(cliente?.vehiculos || []);
+    setVehiculoSeleccionado(""); // Resetear selección
   };
 
-  // Agregar servicio a la factura
-  const agregarServicio = (servicio) => {
-    if (!serviciosSeleccionados.some((s) => s.nombre === servicio.nombre)) {
-      setServiciosSeleccionados([...serviciosSeleccionados, servicio]);
+  // 🔍 Buscar inspección y diagnóstico del vehículo seleccionado
+  const seleccionarVehiculo = (placa) => {
+    setVehiculoSeleccionado(placa);
+
+    const inspecciones = JSON.parse(localStorage.getItem("inspecciones")) || {};
+    const diagnosticos = JSON.parse(localStorage.getItem("diagnosticos")) || {};
+
+    const inspeccion = inspecciones[placa] || {};
+    const diagnostico = diagnosticos[placa] || {};
+
+    // Convertir datos de inspección y diagnóstico en servicios facturables
+    const serviciosDetectados = [];
+
+    Object.entries(inspeccion).forEach(([parte, estado]) => {
+      if (estado !== "normal") {
+        serviciosDetectados.push({ nombre: `Revisión de ${parte}`, precio: 25 });
+      }
+    });
+
+    Object.entries(diagnostico).forEach(([componente, estado]) => {
+      if (estado === "Falla") {
+        serviciosDetectados.push({ nombre: `Reparación de ${componente}`, precio: 80 });
+      } else if (estado === "Desgastados") {
+        serviciosDetectados.push({ nombre: `Cambio de ${componente}`, precio: 50 });
+      }
+    });
+
+    setServiciosAuto(serviciosDetectados);
+    setServiciosManuales([]); // Resetear servicios añadidos manualmente
+  };
+
+  // 🛠 Añadir servicios predefinidos con un clic
+  const agregarServicioPredefinido = (servicio) => {
+    if (!serviciosManuales.some((s) => s.nombre === servicio.nombre)) {
+      setServiciosManuales([...serviciosManuales, servicio]);
     }
   };
 
-  // Eliminar servicio de la factura
-  const eliminarServicio = (index) => {
-    setServiciosSeleccionados(serviciosSeleccionados.filter((_, i) => i !== index));
+  // 📝 Añadir servicios manuales
+  const agregarServicioManual = () => {
+    const nombre = prompt("Ingrese el nombre del servicio:");
+    const precio = parseFloat(prompt("Ingrese el precio del servicio:"));
+
+    if (nombre && !isNaN(precio)) {
+      setServiciosManuales([...serviciosManuales, { nombre, precio }]);
+    }
   };
 
-  // Calcular total
-  const subtotal = serviciosSeleccionados.reduce((sum, servicio) => sum + servicio.precio, 0);
+  // ❌ Eliminar servicio añadido
+  const eliminarServicio = (index) => {
+    setServiciosManuales(serviciosManuales.filter((_, i) => i !== index));
+  };
+
+  // 💰 Calcular totales
+  const subtotal = [...serviciosAuto, ...serviciosManuales].reduce((sum, s) => sum + s.precio, 0);
   const impuestos = subtotal * 0.16;
   const total = subtotal + impuestos;
 
-  // Generar PDF
+  // 📄 Generar factura en PDF
   const generarPDF = () => {
-    if (!clienteSeleccionado || !vehiculoSeleccionado || serviciosSeleccionados.length === 0) {
-      alert("Por favor, complete todos los campos antes de generar la factura.");
+    if (!clienteSeleccionado || !vehiculoSeleccionado) {
+      alert("Debe seleccionar un cliente y un vehículo.");
       return;
     }
 
     const doc = new jsPDF();
+
+    // 🔹 Encabezado
     doc.setFontSize(18);
-    doc.text("Factura de Servicios", 14, 10);
+    doc.text("TallerTech - Factura de Servicios", 14, 10);
 
     doc.setFontSize(12);
     doc.text(`Factura No: ${numFactura}`, 14, 20);
@@ -85,27 +116,14 @@ const Facturacion = () => {
     doc.text(`Cliente: ${clienteSeleccionado}`, 14, 40);
     doc.text(`Vehículo: ${vehiculoSeleccionado}`, 14, 50);
 
-    // Mostrar resultados de la inspección
-    let yPos = 60; // Posición inicial para los resultados
-    if (inspeccion) {
-      doc.text("Resultados de la Inspección:", 14, yPos);
-      yPos += 5;
-      Object.entries(inspeccion).forEach(([parte, estado]) => {
-        doc.setFontSize(10);
-        doc.text(`${parte}: ${estado}`, 14, yPos);
-        yPos += 5; // Incrementar posición vertical
-      });
-      doc.setFontSize(12);
-    }
-
-    // Tabla de servicios
+    // 🛠 Lista de servicios
     doc.autoTable({
-      startY: yPos + 5,
+      startY: 60,
       head: [["Servicio", "Precio ($)"]],
-      body: serviciosSeleccionados.map((servicio) => [servicio.nombre, `$${servicio.precio}`]),
+      body: [...serviciosAuto, ...serviciosManuales].map((s) => [s.nombre, `$${s.precio}`]),
     });
 
-    // Totales
+    // 💰 Totales
     doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 10);
     doc.text(`Impuestos (16%): $${impuestos.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 20);
     doc.text(`Total: $${total.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 30);
@@ -113,106 +131,58 @@ const Facturacion = () => {
     // Guardar PDF
     try {
       doc.save(`Factura_${numFactura}.pdf`);
-      alert("Factura generada correctamente.");
+      alert("✅ Factura generada correctamente.");
     } catch (error) {
-      console.error("Error al generar el PDF:", error);
-      alert("Ocurrió un error al generar la factura. Por favor, inténtalo de nuevo.");
+      console.error("Error al generar PDF:", error);
+      alert("❌ Ocurrió un error al generar la factura.");
     }
   };
 
   return (
     <div className="facturacion-container">
-      <h2>🧾 Generar Factura</h2>
-      <p>Seleccione un cliente, los servicios realizados y genere la factura.</p>
+      <h2>🧾 Facturación de Servicios</h2>
 
-      {/* Selección de Cliente y Vehículo */}
+      {/* 📌 Selección de Cliente y Vehículo */}
       <div className="seleccion">
         <label>👤 Cliente:</label>
-        <select onChange={(e) => setClienteSeleccionado(e.target.value)}>
+        <select onChange={(e) => seleccionarCliente(e.target.value)}>
           <option value="">Seleccione Cliente</option>
           {clientes.map((c) => (
-            <option key={c.id} value={c.nombre}>{c.nombre}</option>
+            <option key={c.id} value={c.id}>{c.nombre}</option>
           ))}
         </select>
 
         <label>🚗 Vehículo:</label>
-        <select onChange={(e) => seleccionarVehiculo(e.target.value.split(" - ")[1])}>
+        <select onChange={(e) => seleccionarVehiculo(e.target.value)} disabled={!clienteSeleccionado}>
           <option value="">Seleccione Vehículo</option>
-          {clientes.map((c) => (
-            <option key={c.id} value={`${c.nombre} - ${c.vehiculo.split(" - ")[1]}`}>
-              {c.vehiculo}
-            </option>
+          {vehiculosCliente.map((v, index) => (
+            <option key={index} value={v.placa}>{v.marca} - {v.placa}</option>
           ))}
         </select>
       </div>
 
-      {/* Resultados de la Inspección */}
-      {inspeccion && (
-        <div className="inspeccion-resultados">
-          <h3>🔍 Resultados de la Inspección</h3>
-          <ul>
-            {Object.entries(inspeccion).map(([parte, estado], index) => (
-              <li key={index}>
-                <strong>{parte}:</strong> {estado}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* 📌 Servicios Predefinidos */}
+      <h3>🔧 Servicios Disponibles</h3>
+      <div className="servicios-disponibles">
+        {serviciosDisponibles.map((servicio, index) => (
+          <button key={index} onClick={() => agregarServicioPredefinido(servicio)}>
+            ➕ {servicio.nombre} - ${servicio.precio}
+          </button>
+        ))}
+      </div>
 
-      {/* Servicios Asociados al Vehículo */}
-      {vehiculoSeleccionado && (
-        <div className="servicios-asociados">
-          <h3>🔧 Servicios Asociados al Vehículo</h3>
-          {serviciosAsociados.length > 0 ? (
-            serviciosAsociados.map((servicio, index) => (
-              <button key={index} onClick={() => agregarServicio(servicio)}>
-                ➕ {servicio.nombre} - ${servicio.precio}
-              </button>
-            ))
-          ) : (
-            <p>No hay servicios asociados a este vehículo.</p>
-          )}
-        </div>
-      )}
+      {/* 🛠 Lista de Servicios Facturados */}
+      <h3>🔧 Servicios Facturados</h3>
+      <ul>
+        {[...serviciosAuto, ...serviciosManuales].map((s, index) => (
+          <li key={index}>{s.nombre} - ${s.precio} {index >= serviciosAuto.length && <button onClick={() => eliminarServicio(index)}>❌</button>}</li>
+        ))}
+      </ul>
+      <button onClick={agregarServicioManual}>➕ Añadir Servicio Manual</button>
 
-      {/* Tabla de Factura */}
-      <h3>🛠 Servicios Seleccionados</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Servicio</th>
-            <th>Precio ($)</th>
-            <th>Eliminar</th>
-          </tr>
-        </thead>
-        <tbody>
-          {serviciosSeleccionados.length > 0 ? (
-            serviciosSeleccionados.map((servicio, index) => (
-              <tr key={index}>
-                <td>{servicio.nombre}</td>
-                <td>${servicio.precio}</td>
-                <td>
-                  <button className="eliminar-btn" onClick={() => eliminarServicio(index)}>❌</button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3">No hay servicios seleccionados.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* Resumen de Factura */}
-      <h3>💰 Total a Pagar</h3>
-      <p>Subtotal: ${subtotal.toFixed(2)}</p>
-      <p>Impuestos (16%): ${impuestos.toFixed(2)}</p>
-      <p><strong>Total: ${total.toFixed(2)}</strong></p>
-
-      {/* Botón para generar factura */}
-      <button className="factura-btn" onClick={generarPDF}>📄 Generar Factura</button>
+      {/* 💳 Generar Factura */}
+      <h3>💰 Total: ${total.toFixed(2)}</h3>
+      <button onClick={generarPDF}>📄 Generar Factura</button>
     </div>
   );
 };

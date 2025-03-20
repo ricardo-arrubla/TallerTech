@@ -14,10 +14,12 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      {/* Logo y Nombre */}
-      <div className="navbar-logo">
+      {/* Logo y Nombre con enlace al Home */}
+      <div className="navbar-logo" onClick={() => navigate("/")}>
         <img src="/TallerTechLogo3.png" alt="TallerTech Logo" />
-        <h1 className="navbar-title">TallerTech</h1>
+        <h1 className="navbar-title" style={{ cursor: "pointer" }}>
+          TallerTech
+        </h1>
       </div>
 
       {/* Botón para abrir/cerrar menú en móviles */}
