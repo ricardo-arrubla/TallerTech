@@ -8,15 +8,26 @@ const RegistroCliente = () => {
 
     // Validar que el ID no exista
     if (clientesGuardados.some((cliente) => cliente.id === data.id)) {
-      alert("El ID ya está registrado. Por favor, use otro.");
+      alert("❌ El ID ya está registrado. Por favor, use otro.");
       return;
     }
 
-    // Guardar el cliente
-    clientesGuardados.push({ id: data.id, nombre: data.nombre });
+    // Validar que todos los campos estén llenos
+    if (!data.nombre || !data.id || !data.tecnomecanica) {
+      alert("❌ Todos los campos son obligatorios.");
+      return;
+    }
+
+    // Guardar cliente con más detalles
+    clientesGuardados.push({
+      id: data.id,
+      nombre: data.nombre,
+      tecnomecanica: data.tecnomecanica,
+    });
+
     localStorage.setItem("clientes", JSON.stringify(clientesGuardados));
 
-    alert("Cliente registrado con éxito.");
+    alert("✅ Cliente registrado con éxito.");
   };
 
   return (
@@ -25,6 +36,7 @@ const RegistroCliente = () => {
       campos={[
         { name: "nombre", label: "Nombre", type: "text", placeholder: "Ingrese su nombre" },
         { name: "id", label: "ID", type: "text", placeholder: "Ingrese su ID" },
+        { name: "tecnomecanica", label: "Vencimiento Tecnomecánica", type: "date" },
       ]}
       onSubmit={handleSubmit}
     />

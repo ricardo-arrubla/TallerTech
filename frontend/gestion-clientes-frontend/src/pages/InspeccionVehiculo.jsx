@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./Estilos/InspeccionVehiculo.css";
 
 const InspeccionVehiculo = () => {
+  const navigate = useNavigate();
+
+  // 🔹 Lista de partes a inspeccionar
   const partesVehiculo = [
     "Luces delanteras",
     "Luces traseras",
@@ -16,80 +19,129 @@ const InspeccionVehiculo = () => {
     "Sistema de escape",
   ];
 
-  // 🚗 Cargar datos desde localStorage al montar el componente
+  // 🧑‍🔧 Estado para selección de cliente y vehículo
+  const [clientes, setClientes] = useState([]);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState("");
+  const [vehiculosCliente, setVehiculosCliente] = useState([]);
+  const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState("");
+
+  // 🔍 Cargar clientes desde `localStorage`
+  useEffect(() => {
+    const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
+    setClientes(clientesGuardados);
+  }, []);
+
+  // 🚗 Cargar vehículos del cliente seleccionado
+  useEffect(() => {
+    if (clienteSeleccionado) {
+      const cliente = clientes.find((c) => c.id === clienteSeleccionado);
+      setVehiculosCliente(cliente?.vehiculos || []);
+    } else {
+      setVehiculosCliente([]);
+    }
+  }, [clienteSeleccionado, clientes]);
+
+  // 🔍 Estado para la inspección del vehículo
   const [inspeccion, setInspeccion] = useState(() => {
-    const inspeccionGuardada = localStorage.getItem("inspeccion");
-    return inspeccionGuardada
-      ? JSON.parse(inspeccionGuardada)
-      : partesVehiculo.reduce((estado, parte) => {
-          estado[parte] = "";
-          return estado;
-        }, {});
+    return partesVehiculo.reduce((estado, parte) => {
+      estado[parte] = "";
+      return estado;
+    }, {});
   });
 
-  const navigate = useNavigate();
-
-  // 🛠 Manejar cambios en la selección y guardar en localStorage en tiempo real
+  // 🛠 Manejar cambios en la inspección
   const handleSelectChange = (parte, estado) => {
-    const nuevaInspeccion = { ...inspeccion, [parte]: estado };
-    setInspeccion(nuevaInspeccion);
-    localStorage.setItem("inspeccion", JSON.stringify(nuevaInspeccion));
+    setInspeccion({ ...inspeccion, [parte]: estado });
   };
 
-  // ✅ Validar progreso
-  const partesCompletadas = Object.values(inspeccion).filter((estado) => estado !== "").length;
-  const totalPartes = partesVehiculo.length;
-  const isInspeccionCompleta = partesCompletadas === totalPartes;
+  // 🔹 Validar si la inspección está completa
+  const isInspeccionCompleta = partesVehiculo.every((parte) => inspeccion[parte] !== "");
 
-  // 🚀 Guardar y continuar al diagnóstico
+  // 🚀 Guardar inspección y continuar
   const handleSiguiente = () => {
+    if (!clienteSeleccionado || !vehiculoSeleccionado) {
+      alert("❌ Debes seleccionar un cliente y un vehículo antes de continuar.");
+      return;
+    }
+
     if (!isInspeccionCompleta) {
       if (!window.confirm("🚨 Aún hay partes sin inspeccionar. ¿Desea continuar de todos modos?")) {
         return;
       }
     }
+
+    // 📌 Guardar inspección asociada al vehículo
+    const inspeccionesGuardadas = JSON.parse(localStorage.getItem("inspecciones")) || {};
+    inspeccionesGuardadas[vehiculoSeleccionado] = inspeccion;
+    localStorage.setItem("inspecciones", JSON.stringify(inspeccionesGuardadas));
+
     navigate("/diagnostico-vehiculo");
   };
 
   return (
     <div className="inspeccion-container">
       <h2>🔍 Inspección del Vehículo</h2>
-      <p>📝 Progreso: {partesCompletadas} de {totalPartes} partes inspeccionadas</p>
-      <form>
-        <table>
-          <thead>
-            <tr>
-              <th>Parte</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {partesVehiculo.map((parte, index) => (
-              <tr key={index}>
-                <td>{parte}</td>
-                <td>
-                  <select
-                    value={inspeccion[parte]}
-                    onChange={(e) => handleSelectChange(parte, e.target.value)}
-                    required
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="normal">✅ Normal</option>
-                    <option value="reparar">🔧 Reparar</option>
-                    <option value="cambiar">♻ Cambiar</option>
-                    <option value="anormal">❌ Anormal</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
 
-        {/* Botón Siguiente */}
-        <button type="button" onClick={handleSiguiente} className="btn-siguiente">
-          {isInspeccionCompleta ? "✅ Completar Inspección" : "➡ Siguiente (Incompleto)"}
-        </button>
-      </form>
+      {/* 🏠 Selección de Cliente */}
+      <label>👤 Seleccionar Cliente:</label>
+      <select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)}>
+        <option value="">Seleccione un cliente</option>
+        {clientes.map((cliente) => (
+          <option key={cliente.id} value={cliente.id}>
+            {cliente.nombre} (ID: {cliente.id})
+          </option>
+        ))}
+      </select>
+
+      {/* 🚗 Selección de Vehículo */}
+      <label>🚗 Seleccionar Vehículo:</label>
+      <select
+        value={vehiculoSeleccionado}
+        onChange={(e) => setVehiculoSeleccionado(e.target.value)}
+        disabled={!clienteSeleccionado}
+      >
+        <option value="">Seleccione un vehículo</option>
+        {vehiculosCliente.map((vehiculo, index) => (
+          <option key={index} value={vehiculo.placa}>
+            {vehiculo.marca} - {vehiculo.placa}
+          </option>
+        ))}
+      </select>
+
+      {/* 🛠 Tabla de Inspección */}
+      <table>
+        <thead>
+          <tr>
+            <th>Parte</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {partesVehiculo.map((parte, index) => (
+            <tr key={index}>
+              <td>{parte}</td>
+              <td>
+                <select
+                  value={inspeccion[parte]}
+                  onChange={(e) => handleSelectChange(parte, e.target.value)}
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="normal">✅ Normal</option>
+                  <option value="reparar">🔧 Reparar</option>
+                  <option value="cambiar">♻ Cambiar</option>
+                  <option value="anormal">❌ Anormal</option>
+                </select>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* 🚀 Botón para continuar */}
+      <button type="button" onClick={handleSiguiente} className="btn-siguiente">
+        {isInspeccionCompleta ? "✅ Completar Inspección" : "➡ Siguiente (Incompleto)"}
+      </button>
     </div>
   );
 };

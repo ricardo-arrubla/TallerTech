@@ -14,18 +14,12 @@ import "./Estilos/DiagnosticoVehiculo.css";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const DiagnosticoVehiculo = () => {
+const DiagnosticoVehiculo = ({ clienteSeleccionado, vehiculoSeleccionado }) => {
   const navigate = useNavigate(); // Hook para redirección
 
-  // Cargar datos de inspección previa
+  // Estado para la inspección previa
   const [inspeccionPrev, setInspeccionPrev] = useState(null);
-
-  useEffect(() => {
-    const inspeccionGuardada = localStorage.getItem("inspeccion");
-    if (inspeccionGuardada) {
-      setInspeccionPrev(JSON.parse(inspeccionGuardada));
-    }
-  }, []);
+  const [mostrarAdvertencia, setMostrarAdvertencia] = useState(false);
 
   // Estado inicial del diagnóstico
   const [estado, setEstado] = useState({
@@ -45,6 +39,23 @@ const DiagnosticoVehiculo = () => {
       traseraDer: -0.4,
     },
   });
+
+  useEffect(() => {
+    if (!vehiculoSeleccionado) {
+      console.error("No se ha seleccionado ningún vehículo.");
+      return;
+    }
+
+    // Simulación: Buscar inspección previa para el vehículo seleccionado
+    const inspeccionesGuardadas = JSON.parse(localStorage.getItem("inspecciones")) || {};
+    const inspeccionVehiculo = inspeccionesGuardadas[vehiculoSeleccionado.id];
+
+    if (inspeccionVehiculo) {
+      setInspeccionPrev(inspeccionVehiculo);
+    } else {
+      setMostrarAdvertencia(true);
+    }
+  }, [vehiculoSeleccionado]);
 
   // Funciones para manejar cambios
   const handleChange = (componente, valor) => {
@@ -143,7 +154,6 @@ const DiagnosticoVehiculo = () => {
 
   // Manejador de redirección
   const handleSiguiente = () => {
-    // Validar si hay problemas críticos antes de avanzar
     const recomendaciones = getRecomendaciones();
     if (recomendaciones.length > 0) {
       const confirmacion = window.confirm(
@@ -152,13 +162,19 @@ const DiagnosticoVehiculo = () => {
       if (!confirmacion) return;
     }
 
-    // Redirigir a la página de facturación
     navigate("/facturacion");
   };
 
   return (
     <div className="diagnostico-container">
       <h2>🛠 Diagnóstico del Vehículo</h2>
+
+      {/* Mostrar advertencia si no hay inspección previa */}
+      {mostrarAdvertencia && (
+        <div className="advertencia">
+          <p>No se encontró ninguna inspección previa para este vehículo.</p>
+        </div>
+      )}
 
       {/* Mostrar datos de inspección previa */}
       {inspeccionPrev && (
