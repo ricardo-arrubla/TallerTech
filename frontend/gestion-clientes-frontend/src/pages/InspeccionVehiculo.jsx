@@ -5,7 +5,6 @@ import "./Estilos/InspeccionVehiculo.css";
 const InspeccionVehiculo = () => {
   const navigate = useNavigate();
 
-  // 🔹 Lista de partes a inspeccionar
   const partesVehiculo = [
     "Luces delanteras",
     "Luces traseras",
@@ -19,45 +18,52 @@ const InspeccionVehiculo = () => {
     "Sistema de escape",
   ];
 
-  // 🧑‍🔧 Estado para selección de cliente y vehículo
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState("");
   const [vehiculosCliente, setVehiculosCliente] = useState([]);
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState("");
 
-  // 🔍 Cargar clientes desde `localStorage`
   useEffect(() => {
     const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
-    setClientes(clientesGuardados);
+    if (!Array.isArray(clientesGuardados)) {
+      console.error("Los datos de clientes en localStorage no son válidos.");
+      setClientes([]);
+    } else {
+      const clientesConIdString = clientesGuardados.map((cliente) => ({
+        ...cliente,
+        id: String(cliente.id),
+      }));
+      setClientes(clientesConIdString);
+    }
   }, []);
 
-  // 🚗 Cargar vehículos del cliente seleccionado
   useEffect(() => {
     if (clienteSeleccionado) {
       const cliente = clientes.find((c) => c.id === clienteSeleccionado);
-      setVehiculosCliente(cliente?.vehiculos || []);
+      if (cliente) {
+        setVehiculosCliente(cliente.vehiculos || []);
+      } else {
+        console.warn("No se encontró el cliente seleccionado.");
+        setVehiculosCliente([]);
+      }
     } else {
       setVehiculosCliente([]);
     }
   }, [clienteSeleccionado, clientes]);
 
-  // 🔍 Estado para la inspección del vehículo
-  const [inspeccion, setInspeccion] = useState(() => {
-    return partesVehiculo.reduce((estado, parte) => {
+  const [inspeccion, setInspeccion] = useState(() =>
+    partesVehiculo.reduce((estado, parte) => {
       estado[parte] = "";
       return estado;
-    }, {});
-  });
+    }, {})
+  );
 
-  // 🛠 Manejar cambios en la inspección
   const handleSelectChange = (parte, estado) => {
     setInspeccion({ ...inspeccion, [parte]: estado });
   };
 
-  // 🔹 Validar si la inspección está completa
   const isInspeccionCompleta = partesVehiculo.every((parte) => inspeccion[parte] !== "");
 
-  // 🚀 Guardar inspección y continuar
   const handleSiguiente = () => {
     if (!clienteSeleccionado || !vehiculoSeleccionado) {
       alert("❌ Debes seleccionar un cliente y un vehículo antes de continuar.");
@@ -70,7 +76,6 @@ const InspeccionVehiculo = () => {
       }
     }
 
-    // 📌 Guardar inspección asociada al vehículo
     const inspeccionesGuardadas = JSON.parse(localStorage.getItem("inspecciones")) || {};
     inspeccionesGuardadas[vehiculoSeleccionado] = inspeccion;
     localStorage.setItem("inspecciones", JSON.stringify(inspeccionesGuardadas));
@@ -82,9 +87,14 @@ const InspeccionVehiculo = () => {
     <div className="inspeccion-container">
       <h2>🔍 Inspección del Vehículo</h2>
 
-      {/* 🏠 Selección de Cliente */}
       <label>👤 Seleccionar Cliente:</label>
-      <select value={clienteSeleccionado} onChange={(e) => setClienteSeleccionado(e.target.value)}>
+      <select
+        value={clienteSeleccionado}
+        onChange={(e) => {
+          console.log("Cliente seleccionado:", e.target.value);
+          setClienteSeleccionado(e.target.value);
+        }}
+      >
         <option value="">Seleccione un cliente</option>
         {clientes.map((cliente) => (
           <option key={cliente.id} value={cliente.id}>
@@ -93,7 +103,6 @@ const InspeccionVehiculo = () => {
         ))}
       </select>
 
-      {/* 🚗 Selección de Vehículo */}
       <label>🚗 Seleccionar Vehículo:</label>
       <select
         value={vehiculoSeleccionado}
@@ -108,7 +117,6 @@ const InspeccionVehiculo = () => {
         ))}
       </select>
 
-      {/* 🛠 Tabla de Inspección */}
       <table>
         <thead>
           <tr>
@@ -138,7 +146,6 @@ const InspeccionVehiculo = () => {
         </tbody>
       </table>
 
-      {/* 🚀 Botón para continuar */}
       <button type="button" onClick={handleSiguiente} className="btn-siguiente">
         {isInspeccionCompleta ? "✅ Completar Inspección" : "➡ Siguiente (Incompleto)"}
       </button>

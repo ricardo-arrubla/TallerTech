@@ -18,6 +18,9 @@ const AgendarCita = () => {
     telefono: "",
   });
 
+  // Estado para las citas agendadas
+  const [citas, setCitas] = useState([]);
+
   // Lista de servicios disponibles
   const serviciosDisponibles = [
     "Cambio de Aceite",
@@ -33,6 +36,12 @@ const AgendarCita = () => {
     setClientes(clientesGuardados);
   }, []);
 
+  // Cargar citas desde LocalStorage al iniciar
+  useEffect(() => {
+    const citasGuardadas = JSON.parse(localStorage.getItem("citasTaller")) || [];
+    setCitas(citasGuardadas);
+  }, []);
+
   // Cargar vehículos del cliente seleccionado
   useEffect(() => {
     if (clienteSeleccionado) {
@@ -43,6 +52,12 @@ const AgendarCita = () => {
     }
   }, [clienteSeleccionado, clientes]);
 
+  // Función para obtener el nombre del cliente por ID
+  const obtenerNombreCliente = (id) => {
+    const cliente = clientes.find((c) => c.id === id);
+    return cliente ? cliente.nombre : "Desconocido";
+  };
+
   // Manejar cambios en los inputs
   const handleChange = (e) => {
     setCita({ ...cita, [e.target.name]: e.target.value });
@@ -51,8 +66,8 @@ const AgendarCita = () => {
   // Enviar email con EmailJS
   const enviarRecordatorio = (cita) => {
     const templateParams = {
-      name: clienteSeleccionado,
-      vehiculo: vehiculoSeleccionado,
+      name: obtenerNombreCliente(cita.cliente),
+      vehiculo: cita.vehiculo,
       fecha: cita.fecha,
       hora: cita.hora,
       servicio: cita.servicio,
@@ -78,9 +93,9 @@ const AgendarCita = () => {
     }
 
     const nuevaCita = { cliente: clienteSeleccionado, vehiculo: vehiculoSeleccionado, ...cita };
-    const citasGuardadas = JSON.parse(localStorage.getItem("citasTaller")) || [];
-    citasGuardadas.push(nuevaCita);
-    localStorage.setItem("citasTaller", JSON.stringify(citasGuardadas));
+    const nuevasCitas = [...citas, nuevaCita];
+    setCitas(nuevasCitas);
+    localStorage.setItem("citasTaller", JSON.stringify(nuevasCitas));
 
     enviarRecordatorio(nuevaCita);
 
@@ -88,6 +103,9 @@ const AgendarCita = () => {
     setCita({ fecha: "", hora: "", servicio: "", email: "", telefono: "" });
     setVehiculoSeleccionado(""); // Reiniciar selección
   };
+
+  // Filtrar citas del día actual
+  const citasDelDia = citas.filter((c) => c.fecha === new Date().toISOString().split("T")[0]);
 
   return (
     <div className="citas-container">
@@ -112,12 +130,21 @@ const AgendarCita = () => {
         disabled={!clienteSeleccionado}
       >
         <option value="">Seleccione un vehículo</option>
-        {vehiculosCliente.map((vehiculo, index) => (
-          <option key={index} value={vehiculo.placa}>
-            {vehiculo.marca} - {vehiculo.placa}
+        {vehiculosCliente.length > 0 ? (
+          vehiculosCliente.map((vehiculo, index) => (
+            <option key={index} value={vehiculo.placa}>
+              {vehiculo.marca} - {vehiculo.placa}
+            </option>
+          ))
+        ) : (
+          <option value="" disabled>
+            No hay vehículos disponibles
           </option>
-        ))}
+        )}
       </select>
+      {clienteSeleccionado && vehiculosCliente.length === 0 && (
+        <button onClick={() => alert("Por favor, agregue un vehículo al cliente.")}>Agregar Vehículo</button>
+      )}
 
       {/* Formulario de Agendamiento */}
       <form onSubmit={agendarCita}>
@@ -145,6 +172,7 @@ const AgendarCita = () => {
           onChange={handleChange}
           placeholder="Ingrese su correo"
           required
+          pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
         />
 
         <label>📞 Teléfono:</label>
@@ -155,6 +183,7 @@ const AgendarCita = () => {
           onChange={handleChange}
           placeholder="Ingrese su teléfono"
           required
+          pattern="[0-9]{7,}"
         />
 
         <button type="submit">📌 Agendar Cita</button>
@@ -163,14 +192,30 @@ const AgendarCita = () => {
       {/* Mostrar Citas Agendadas */}
       <h3>📋 Citas Agendadas</h3>
       <ul>
-        {JSON.parse(localStorage.getItem("citasTaller") || "[]").map((cita, index) => (
+        {citas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha)).map((cita, index) => (
           <li key={index}>
-            <strong>Cliente:</strong> {cita.cliente} <br />
+            <strong>Cliente:</strong> {obtenerNombreCliente(cita.cliente)} <br />
             <strong>Vehículo:</strong> {cita.vehiculo} <br />
             🗓 {cita.fecha} ⏰ {cita.hora} - {cita.servicio} <br />
             📩 {cita.email} | 📞 {cita.telefono}
           </li>
         ))}
+      </ul>
+
+      {/* Citas del Día Actual */}
+      <h3>📅 Citas de Hoy</h3>
+      <ul>
+        {citasDelDia.length > 0 ? (
+          citasDelDia.map((cita, index) => (
+            <li key={index}>
+              <strong>Cliente:</strong> {obtenerNombreCliente(cita.cliente)} <br />
+              <strong>Vehículo:</strong> {cita.vehiculo} <br />
+              🕒 {cita.hora} - {cita.servicio}
+            </li>
+          ))
+        ) : (
+          <li>No hay citas programadas para hoy.</li>
+        )}
       </ul>
     </div>
   );
