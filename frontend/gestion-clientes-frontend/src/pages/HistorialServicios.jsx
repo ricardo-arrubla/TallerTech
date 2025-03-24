@@ -4,33 +4,37 @@ import "jspdf-autotable";
 import "./Estilos/HistorialServicios.css";
 
 const HistorialServicios = () => {
-  // Cargar datos desde localStorage
+  // Estados
   const [historial, setHistorial] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [detalleVehiculo, setDetalleVehiculo] = useState(null);
 
+  // Cargar datos desde localStorage
   useEffect(() => {
     const serviciosGuardados = JSON.parse(localStorage.getItem("historialServicios")) || [];
     setHistorial(serviciosGuardados);
   }, []);
 
-  // Filtrar servicios por cliente o placa
-  const handleSearch = (e) => {
-    const valor = e.target.value.toLowerCase();
-    setFiltro(valor);
-
-    if (valor === "") {
-      setHistorial(JSON.parse(localStorage.getItem("historialServicios")) || []);
-    } else {
-      setHistorial(
-        (JSON.parse(localStorage.getItem("historialServicios")) || []).filter(
+  // Búsqueda con debounce
+  useEffect(() => {
+    let timeout;
+    if (filtro.trim() !== "") {
+      timeout = setTimeout(() => {
+        const serviciosGuardados = JSON.parse(localStorage.getItem("historialServicios")) || [];
+        const filtrado = serviciosGuardados.filter(
           (servicio) =>
-            servicio.cliente.toLowerCase().includes(valor) ||
-            servicio.placa.toLowerCase().includes(valor)
-        )
-      );
+            servicio.cliente.toLowerCase().includes(filtro.toLowerCase()) ||
+            servicio.placa.toLowerCase().includes(filtro.toLowerCase())
+        );
+        setHistorial(filtrado);
+      }, 300); // Debounce de 300ms
+    } else {
+      const serviciosGuardados = JSON.parse(localStorage.getItem("historialServicios")) || [];
+      setHistorial(serviciosGuardados);
     }
-  };
+
+    return () => clearTimeout(timeout);
+  }, [filtro]);
 
   // Ver detalles del vehículo
   const verDetalles = (placa) => {
@@ -41,7 +45,7 @@ const HistorialServicios = () => {
 
     setDetalleVehiculo({
       placa,
-      inspecciones: inspecciones[placa] || [],
+      inspecciones: inspecciones[placa] || {},
       servicios: historialServicios.filter((s) => s.placa === placa),
       facturas: facturas[placa] || [],
     });
@@ -55,14 +59,17 @@ const HistorialServicios = () => {
   // Exportar historial completo a PDF
   const exportarPDF = () => {
     const doc = new jsPDF();
-    doc.text("Historial Completo del Vehículo", 14, 10);
 
-    historial.forEach((servicio, index) => {
-      doc.text(`Cliente: ${servicio.cliente}`, 14, 20 + index * 10);
-      doc.text(`Placa: ${servicio.placa}`, 14, 25 + index * 10);
-      doc.text(`Fecha: ${servicio.fecha}`, 14, 30 + index * 10);
-      doc.text(`Servicio: ${servicio.servicio}`, 14, 35 + index * 10);
-      doc.text(`Costo: $${servicio.costo}`, 14, 40 + index * 10);
+    // Uso de autoTable para mejorar el formato
+    doc.autoTable({
+      head: [["Cliente", "Placa", "Fecha", "Servicio", "Costo"]],
+      body: historial.map((servicio) => [
+        servicio.cliente,
+        servicio.placa,
+        servicio.fecha,
+        servicio.servicio,
+        `$${servicio.costo}`,
+      ]),
     });
 
     doc.save("historial_completo.pdf");
@@ -72,13 +79,15 @@ const HistorialServicios = () => {
     <div className="historial-container">
       <h2>📋 Historial de Servicios</h2>
 
+      {/* Barra de búsqueda */}
       <input
         type="text"
         placeholder="Buscar por cliente o placa..."
         value={filtro}
-        onChange={handleSearch}
+        onChange={(e) => setFiltro(e.target.value)}
       />
 
+      {/* Tabla de historial */}
       <table>
         <thead>
           <tr>
@@ -108,6 +117,7 @@ const HistorialServicios = () => {
         </tbody>
       </table>
 
+      {/* Botón para exportar PDF */}
       <button onClick={exportarPDF}>📄 Exportar a PDF</button>
 
       {/* Modal de detalles del vehículo */}
@@ -117,12 +127,13 @@ const HistorialServicios = () => {
             <h3>📖 Historial Completo del Vehículo</h3>
             <p>🚗 Placa: {detalleVehiculo.placa}</p>
 
+            {/* Inspecciones previas */}
             <h4>🔍 Inspecciones Previas</h4>
-            {detalleVehiculo.inspecciones.length > 0 ? (
+            {Object.keys(detalleVehiculo.inspecciones).length > 0 ? (
               <ul>
-                {detalleVehiculo.inspecciones.map((insp, index) => (
+                {Object.entries(detalleVehiculo.inspecciones).map(([parte, estado], index) => (
                   <li key={index}>
-                    {insp.fecha} - {insp.estado}
+                    {parte}: {estado}
                   </li>
                 ))}
               </ul>
@@ -130,6 +141,7 @@ const HistorialServicios = () => {
               <p>No hay inspecciones registradas.</p>
             )}
 
+            {/* Servicios realizados */}
             <h4>🛠 Servicios Realizados</h4>
             {detalleVehiculo.servicios.length > 0 ? (
               <ul>
@@ -143,6 +155,7 @@ const HistorialServicios = () => {
               <p>No hay servicios registrados.</p>
             )}
 
+            {/* Facturación asociada */}
             <h4>🧾 Facturación Asociada</h4>
             {detalleVehiculo.facturas.length > 0 ? (
               <ul>
@@ -156,6 +169,7 @@ const HistorialServicios = () => {
               <p>No hay facturas registradas.</p>
             )}
 
+            {/* Botón para cerrar el modal */}
             <button className="cerrar-btn" onClick={cerrarDetalles}>
               ❌ Cerrar
             </button>

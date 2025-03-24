@@ -29,6 +29,11 @@ const Facturacion = () => {
   useEffect(() => {
     const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
     setClientes(clientesGuardados);
+
+    // Número de factura incremental
+    const facturas = JSON.parse(localStorage.getItem("facturas")) || [];
+    const siguienteNumero = String(facturas.length + 1).padStart(3, "0");
+    setNumFactura(siguienteNumero);
   }, []);
 
   // 🚗 Cargar vehículos del cliente seleccionado
@@ -106,6 +111,9 @@ const Facturacion = () => {
 
     const doc = new jsPDF();
 
+    const clienteInfo = clientes.find((c) => c.id === clienteSeleccionado);
+    const vehiculoInfo = vehiculosCliente.find((v) => v.placa === vehiculoSeleccionado);
+
     // 🔹 Encabezado
     doc.setFontSize(18);
     doc.text("TallerTech - Factura de Servicios", 14, 10);
@@ -113,8 +121,8 @@ const Facturacion = () => {
     doc.setFontSize(12);
     doc.text(`Factura No: ${numFactura}`, 14, 20);
     doc.text(`Fecha: ${fecha}`, 14, 30);
-    doc.text(`Cliente: ${clienteSeleccionado}`, 14, 40);
-    doc.text(`Vehículo: ${vehiculoSeleccionado}`, 14, 50);
+    doc.text(`Cliente: ${clienteInfo?.nombre} (ID: ${clienteSeleccionado})`, 14, 40);
+    doc.text(`Vehículo: ${vehiculoInfo?.marca} - ${vehiculoSeleccionado}`, 14, 50);
 
     // 🛠 Lista de servicios
     doc.autoTable({
@@ -127,6 +135,11 @@ const Facturacion = () => {
     doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 10);
     doc.text(`Impuestos (16%): $${impuestos.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 20);
     doc.text(`Total: $${total.toFixed(2)}`, 14, doc.autoTable.previous.finalY + 30);
+
+    // Guardar factura en localStorage
+    const facturas = JSON.parse(localStorage.getItem("facturas")) || [];
+    facturas.push({ numFactura, cliente: clienteInfo?.nombre, vehiculo: vehiculoInfo?.marca, total });
+    localStorage.setItem("facturas", JSON.stringify(facturas));
 
     // Guardar PDF
     try {
@@ -148,7 +161,9 @@ const Facturacion = () => {
         <select onChange={(e) => seleccionarCliente(e.target.value)}>
           <option value="">Seleccione Cliente</option>
           {clientes.map((c) => (
-            <option key={c.id} value={c.id}>{c.nombre}</option>
+            <option key={c.id} value={c.id}>
+              {c.nombre}
+            </option>
           ))}
         </select>
 
@@ -156,7 +171,9 @@ const Facturacion = () => {
         <select onChange={(e) => seleccionarVehiculo(e.target.value)} disabled={!clienteSeleccionado}>
           <option value="">Seleccione Vehículo</option>
           {vehiculosCliente.map((v, index) => (
-            <option key={index} value={v.placa}>{v.marca} - {v.placa}</option>
+            <option key={index} value={v.placa}>
+              {v.marca} - {v.placa}
+            </option>
           ))}
         </select>
       </div>
@@ -175,10 +192,19 @@ const Facturacion = () => {
       <h3>🔧 Servicios Facturados</h3>
       <ul>
         {[...serviciosAuto, ...serviciosManuales].map((s, index) => (
-          <li key={index}>{s.nombre} - ${s.precio} {index >= serviciosAuto.length && <button onClick={() => eliminarServicio(index)}>❌</button>}</li>
+          <li key={index}>
+            {s.nombre} - ${s.precio}{" "}
+            {index >= serviciosAuto.length && <button onClick={() => eliminarServicio(index)}>❌</button>}
+          </li>
         ))}
       </ul>
       <button onClick={agregarServicioManual}>➕ Añadir Servicio Manual</button>
+
+      {/* Botón para limpiar servicios seleccionados */}
+      <button onClick={() => {
+        setServiciosManuales([]);
+        setServiciosAuto([]);
+      }}>🧹 Limpiar Servicios</button>
 
       {/* 💳 Generar Factura */}
       <h3>💰 Total: ${total.toFixed(2)}</h3>
