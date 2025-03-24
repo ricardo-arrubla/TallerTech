@@ -13,3 +13,10 @@ app.include_router(canales.router)
 def read_root():
     return {"message": "Backend funcionando correctamente 🚀"}
 
+from app.models.cliente import Cliente
+from app.models.vehiculo import Vehiculo
+from app.models.database import engine
+from sqlalchemy.orm import declarative_base
+
+Base = Cliente.__bases__[0]  # Obtener Base declarada
+Base.metadata.create_all(bind=engine)
