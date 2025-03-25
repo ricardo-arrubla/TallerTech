@@ -1,17 +1,9 @@
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
-from .database import metadata
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base(metadata=metadata)
+from sqlalchemy import Column, String, Date
+from app.models.database import Base
 
 class Cliente(Base):
     __tablename__ = "clientes"
 
     id = Column(String, primary_key=True, index=True)
-    nombre = Column(String)
-    telefono = Column(String)
-    email = Column(String)
-
-    vehiculos = relationship("Vehiculo", back_populates="cliente")
- 
+    nombre = Column(String, nullable=False)
+    tecnomecanica = Column(Date, nullable=False)

@@ -1,13 +1,16 @@
- ##Database de Backend
- 
- # backend/app/models/database.py
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")  # Temporal para desarrollo
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")  # Cambiar luego si usas PostgreSQL
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-metadata = MetaData()
+Base = declarative_base()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
