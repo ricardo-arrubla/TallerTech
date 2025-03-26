@@ -1,15 +1,37 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.models.database import get_db
-from app.models.cliente_model import Cliente
+from app.models.database import SessionLocal
+from app.models.cliente import Cliente
 from app.schemas.cliente_schema import ClienteBase, ClienteOut
 
 router = APIRouter()
 
+# 👉 Dependency para obtener la sesión de la DB
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# 🔹 Obtener todos los clientes
+@router.get("/clientes", response_model=list[ClienteOut])
+def listar_clientes(db: Session = Depends(get_db)):
+    return db.query(Cliente).all()
+
+# 🔹 Obtener un cliente por ID
+@router.get("/clientes/{id}", response_model=ClienteOut)
+def obtener_cliente(id: str, db: Session = Depends(get_db)):
+    cliente = db.query(Cliente).filter(Cliente.id == id).first()
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    return cliente
+
+# 🔹 Crear cliente
 @router.post("/clientes", response_model=ClienteOut)
 def crear_cliente(cliente: ClienteBase, db: Session = Depends(get_db)):
-    db_cliente = db.query(Cliente).filter(Cliente.id == cliente.id).first()
-    if db_cliente:
+    existe = db.query(Cliente).filter(Cliente.id == cliente.id).first()
+    if existe:
         raise HTTPException(status_code=400, detail="Cliente ya existe")
     nuevo = Cliente(**cliente.dict())
     db.add(nuevo)
@@ -17,6 +39,23 @@ def crear_cliente(cliente: ClienteBase, db: Session = Depends(get_db)):
     db.refresh(nuevo)
     return nuevo
 
-@router.get("/clientes", response_model=list[ClienteOut])
-def listar_clientes(db: Session = Depends(get_db)):
-    return db.query(Cliente).all()
+# 🔹 Actualizar cliente
+@router.put("/clientes/{id}", response_model=ClienteOut)
+def actualizar_cliente(id: str, datos: ClienteBase, db: Session = Depends(get_db)):
+    cliente = db.query(Cliente).filter(Cliente.id == id).first()
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    for attr, value in datos.dict().items():
+        setattr(cliente, attr, value)
+    db.commit()
+    return cliente
+
+# 🔹 Eliminar cliente
+@router.delete("/clientes/{id}")
+def eliminar_cliente(id: str, db: Session = Depends(get_db)):
+    cliente = db.query(Cliente).filter(Cliente.id == id).first()
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    db.delete(cliente)
+    db.commit()
+    return {"message": "Cliente eliminado"}

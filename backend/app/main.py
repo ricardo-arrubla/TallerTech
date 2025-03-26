@@ -2,12 +2,15 @@
 
 from fastapi import FastAPI
 from app.routes import clientes, consumos, canales
+from app.routes import servicios
 
 app = FastAPI()
 
 app.include_router(clientes.router)
 app.include_router(consumos.router)
 app.include_router(canales.router)
+app.include_router(servicios.router)
+
 
 @app.get("/")
 def read_root():
