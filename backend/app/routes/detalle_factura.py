@@ -6,6 +6,7 @@ from app.schemas.detalle_factura_schema import DetalleFacturaBase, DetalleFactur
 
 router = APIRouter()
 
+# Dependency para obtener la sesión de la base de datos
 def get_db():
     db = SessionLocal()
     try:
@@ -13,10 +14,12 @@ def get_db():
     finally:
         db.close()
 
+# 🔹 Listar todos los detalles de factura
 @router.get("/detalle-factura", response_model=list[DetalleFacturaOut])
 def listar_detalles(db: Session = Depends(get_db)):
     return db.query(DetalleFactura).all()
 
+# 🔹 Obtener un detalle por ID
 @router.get("/detalle-factura/{id_detalle}", response_model=DetalleFacturaOut)
 def obtener_detalle(id_detalle: str, db: Session = Depends(get_db)):
     detalle = db.query(DetalleFactura).filter(DetalleFactura.id_detalle == id_detalle).first()
@@ -24,6 +27,7 @@ def obtener_detalle(id_detalle: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Detalle no encontrado")
     return detalle
 
+# 🔹 Crear nuevo detalle
 @router.post("/detalle-factura", response_model=DetalleFacturaOut)
 def crear_detalle(detalle: DetalleFacturaBase, db: Session = Depends(get_db)):
     existe = db.query(DetalleFactura).filter(DetalleFactura.id_detalle == detalle.id_detalle).first()
@@ -35,6 +39,7 @@ def crear_detalle(detalle: DetalleFacturaBase, db: Session = Depends(get_db)):
     db.refresh(nuevo)
     return nuevo
 
+# 🔹 Actualizar detalle
 @router.put("/detalle-factura/{id_detalle}", response_model=DetalleFacturaOut)
 def actualizar_detalle(id_detalle: str, datos: DetalleFacturaBase, db: Session = Depends(get_db)):
     detalle = db.query(DetalleFactura).filter(DetalleFactura.id_detalle == id_detalle).first()
@@ -45,6 +50,7 @@ def actualizar_detalle(id_detalle: str, datos: DetalleFacturaBase, db: Session =
     db.commit()
     return detalle
 
+# 🔹 Eliminar detalle
 @router.delete("/detalle-factura/{id_detalle}")
 def eliminar_detalle(id_detalle: str, db: Session = Depends(get_db)):
     detalle = db.query(DetalleFactura).filter(DetalleFactura.id_detalle == id_detalle).first()
