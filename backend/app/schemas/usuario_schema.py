@@ -8,4 +8,4 @@ class UsuarioOut(BaseModel):
     id_usuario: str
 
     class Config:
-        from_attributes = True
+        from_attributes = True  # Para mapear desde ORM
