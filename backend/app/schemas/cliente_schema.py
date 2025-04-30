@@ -5,7 +5,10 @@ class ClienteBase(BaseModel):
     id: str
     nombre: str
     tecnomecanica: date
+    email: str | None = None
+    telefono: str | None = None
+    direccion: str | None = None
 
 class ClienteOut(ClienteBase):
     class Config:
-        orm_mode = True
+        from_attributes = True  # Pydantic v2

@@ -7,3 +7,6 @@ class Cliente(Base):
     id = Column(String, primary_key=True, index=True)
     nombre = Column(String, nullable=False)
     tecnomecanica = Column(Date, nullable=False)
+    email = Column(String, nullable=True)
+    telefono = Column(String, nullable=True)
+    direccion = Column(String, nullable=True)
