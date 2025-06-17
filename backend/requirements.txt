@@ -4,7 +4,9 @@ sqlalchemy
 pydantic
 python-jose[cryptography]
 passlib[bcrypt]
+python-multipart
 
 Use:
 
 pip install -r requirements.txt
+
