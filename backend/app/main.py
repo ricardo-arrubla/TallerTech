@@ -18,8 +18,17 @@ from app.models import (
     diagnostico, inspeccion  
 )
 
-app = FastAPI(title="API de Gestión de Taller", version="1.0")
+from fastapi.middleware.cors import CORSMiddleware
 
+
+
+app = FastAPI(title="API de Gestión de Taller", version="1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://tallertech.vercel.app"],  # Reemplaza con tu URL
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # CORS: Permite las solicitudes desde el frontend - MODIFICADO para producción
 app.add_middleware(
     CORSMiddleware,
