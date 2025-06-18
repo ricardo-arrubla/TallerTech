@@ -23,6 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(title="API de Gestión de Taller", version="1.0")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -31,7 +32,7 @@ app.add_middleware(
         "*"                               # Temporal para pruebas
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

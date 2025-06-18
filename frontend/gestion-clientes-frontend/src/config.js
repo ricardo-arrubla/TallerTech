@@ -1,8 +1,7 @@
-// frontend/config.js (o frontend/src/config.js)
+// frontend/gestion-clientes-frontend/src/config.js
 const config = {
-  API_BASE_URL: process.env.NODE_ENV === 'production' 
-    ? '/api'  // En Railway, las rutas son relativas
-    : 'http://localhost:8000/api', // En desarrollo local
+  // Usa import.meta.env en lugar de process.env para Vite
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 };
 
 export default config;
