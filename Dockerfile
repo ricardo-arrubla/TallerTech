@@ -20,4 +20,5 @@ RUN mkdir -p /app/data
 EXPOSE $PORT
 
 # Comando para ejecutar la aplicación - 
-CMD ["python", "-m", "app.main"]
+#CMD ["python", "-m", "app.main"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
