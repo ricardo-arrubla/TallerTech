@@ -49,3 +49,11 @@ def read_root():
 
 # Crear todas las tablas (solo para desarrollo, no en producción)
 Base.metadata.create_all(bind=engine)
+
+# AGREGAR ESTAS LÍNEAS AL FINAL:
+import os
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
