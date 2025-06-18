@@ -25,22 +25,16 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="API de Gestión de Taller", version="1.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://tallertech.vercel.app"],  # Reemplaza con tu URL
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-# CORS: Permite las solicitudes desde el frontend - MODIFICADO para producción
-app.add_middleware(
-    CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Para desarrollo
-        "http://localhost:3000",  # Para desarrollo alternativo
-        "*"  # Para producción (o especifica tu dominio de Railway)
+        "https://tallertech.vercel.app",  # Producción
+        "http://localhost:5173",          # Desarrollo
+        "*"                               # Temporal para pruebas
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ============= RUTAS API (con prefijo /api) =============
 # IMPORTANTE: Agregar prefijo /api a todas las rutas para evitar conflictos
