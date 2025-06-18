@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import config from "../config";
 import "./Estilos/Login.css";
+
 
 const Login = () => {
   const [usuario, setUsuario] = useState("");
@@ -27,14 +29,73 @@ const Login = () => {
       return;
     }
 
+<<<<<<< Updated upstream
     if (usuario === credenciales.usuario && password === credenciales.password) {
       localStorage.setItem("usuario", usuario);
       navigate("/"); // Redirige a la página principal después de iniciar sesión
+=======
+    // CAMBIO: Usar config.API_BASE_URL en lugar de URL hardcodeada
+    const response = await fetch(`${config.API_BASE_URL}/api/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_usuario: usuario,
+        contraseña: password,
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (response.ok) {
+      localStorage.setItem("token", data.access_token);
+      navigate("/clientes");
+>>>>>>> Stashed changes
     } else {
       setError("❌ Usuario o contraseña incorrectos");
     }
   };
 
+<<<<<<< Updated upstream
+=======
+  const handleSubmitRegister = async (e) => {
+    e.preventDefault();
+
+    if (!isValidRegisterForm()) {
+      setRegisterError("❌ Por favor, completa todos los campos.");
+      return;
+    }
+
+    if (!doPasswordsMatch()) {
+      setRegisterError("❌ Las contraseñas no coinciden.");
+      return;
+    }
+
+    // CAMBIO: Usar config.API_BASE_URL en lugar de URL hardcodeada
+    const response = await fetch(`${config.API_BASE_URL}/api/usuarios`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id_usuario: newUser,
+        contraseña: newPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setRegisterError("");
+      setShowRegisterForm(false); 
+      alert("✅ Registro exitoso. Ahora puedes iniciar sesión.");
+    } else {
+      setRegisterError("❌ Error al registrar el usuario.");
+    }
+  };
+
+>>>>>>> Stashed changes
   return (
     <div className="login-container">
       {/* Logo */}
