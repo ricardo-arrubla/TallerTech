@@ -16,9 +16,8 @@ COPY backend/ .
 # Crear el directorio para la base de datos si no existe
 RUN mkdir -p /app/data
 
-# Exponer el puerto que Railway asignará
-EXPOSE $PORT
+# Exponer el puerto
+EXPOSE 8000
 
-# Comando para ejecutar la aplicación - 
-#CMD ["python", "-m", "app.main"]
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Usar shell para manejar la variable de entorno PORT
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
