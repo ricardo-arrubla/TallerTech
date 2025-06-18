@@ -18,7 +18,6 @@ from app.models import (
     diagnostico, inspeccion  
 )
 
-from fastapi.middleware.cors import CORSMiddleware
 
 
 
