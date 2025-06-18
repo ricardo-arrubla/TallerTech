@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import emailjs from "@emailjs/browser";
 import "./Estilos/AgendarCita.css";
+import config from "../config";
 
 const AgendarCita = () => {
   // Estados para selección de cliente y vehículo
@@ -30,27 +31,109 @@ const AgendarCita = () => {
     "Cambio de Batería",
   ];
 
-  // Cargar clientes desde LocalStorage al iniciar
-  useEffect(() => {
-    const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
-    setClientes(clientesGuardados);
-  }, []);
+  // ============= FUNCIONES API =============
+  
+  // Cargar clientes desde la API
+  const cargarClientes = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/clientes`);
+      if (response.ok) {
+        const clientesData = await response.json();
+        setClientes(clientesData);
+      }
+    } catch (error) {
+      console.error("Error al cargar clientes:", error);
+      // Fallback a localStorage si falla la API
+      const clientesGuardados = JSON.parse(localStorage.getItem("clientes")) || [];
+      setClientes(clientesGuardados);
+    }
+  };
 
-  // Cargar citas desde LocalStorage al iniciar
+  // Cargar citas desde la API
+  const cargarCitas = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/citas`);
+      if (response.ok) {
+        const citasData = await response.json();
+        setCitas(citasData);
+      }
+    } catch (error) {
+      console.error("Error al cargar citas:", error);
+      // Fallback a localStorage si falla la API
+      const citasGuardadas = JSON.parse(localStorage.getItem("citasTaller")) || [];
+      setCitas(citasGuardadas);
+    }
+  };
+
+  // Cargar vehículos de un cliente específico
+  const cargarVehiculosCliente = async (clienteId) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/vehiculos?cliente_id=${clienteId}`);
+      if (response.ok) {
+        const vehiculosData = await response.json();
+        setVehiculosCliente(vehiculosData);
+      }
+    } catch (error) {
+      console.error("Error al cargar vehículos:", error);
+      // Fallback: buscar en datos locales
+      const cliente = clientes.find((c) => c.id === clienteId);
+      setVehiculosCliente(cliente?.vehiculos || []);
+    }
+  };
+
+  // Guardar cita en la API
+  const guardarCitaAPI = async (nuevaCita) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/citas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cliente_id: nuevaCita.cliente,
+          vehiculo_id: nuevaCita.vehiculo, // Asegúrate de que esto coincida con tu API
+          fecha: nuevaCita.fecha,
+          hora: nuevaCita.hora,
+          servicio: nuevaCita.servicio,
+          email: nuevaCita.email,
+          telefono: nuevaCita.telefono,
+        }),
+      });
+
+      if (response.ok) {
+        const citaGuardada = await response.json();
+        return citaGuardada;
+      } else {
+        throw new Error('Error al guardar en API');
+      }
+    } catch (error) {
+      console.error("Error al guardar cita en API:", error);
+      // Fallback a localStorage
+      const nuevasCitas = [...citas, nuevaCita];
+      setCitas(nuevasCitas);
+      localStorage.setItem("citasTaller", JSON.stringify(nuevasCitas));
+      return nuevaCita;
+    }
+  };
+
+  // ============= EFFECTS =============
+
+  // Cargar datos al iniciar el componente
   useEffect(() => {
-    const citasGuardadas = JSON.parse(localStorage.getItem("citasTaller")) || [];
-    setCitas(citasGuardadas);
+    cargarClientes();
+    cargarCitas();
   }, []);
 
   // Cargar vehículos del cliente seleccionado
   useEffect(() => {
     if (clienteSeleccionado) {
-      const cliente = clientes.find((c) => c.id === clienteSeleccionado);
-      setVehiculosCliente(cliente?.vehiculos || []);
+      cargarVehiculosCliente(clienteSeleccionado);
     } else {
       setVehiculosCliente([]);
     }
-  }, [clienteSeleccionado, clientes]);
+  }, [clienteSeleccionado]);
+
+  // ============= FUNCIONES DE UTILIDAD =============
 
   // Función para obtener el nombre del cliente por ID
   const obtenerNombreCliente = (id) => {
@@ -84,8 +167,8 @@ const AgendarCita = () => {
       });
   };
 
-  // Guardar cita en LocalStorage
-  const agendarCita = (e) => {
+  // Guardar cita (ahora usa API)
+  const agendarCita = async (e) => {
     e.preventDefault();
     if (!clienteSeleccionado || !vehiculoSeleccionado || !cita.fecha || !cita.hora || !cita.servicio || !cita.email || !cita.telefono) {
       alert("❌ Debes completar todos los campos.");
@@ -93,15 +176,28 @@ const AgendarCita = () => {
     }
 
     const nuevaCita = { cliente: clienteSeleccionado, vehiculo: vehiculoSeleccionado, ...cita };
-    const nuevasCitas = [...citas, nuevaCita];
-    setCitas(nuevasCitas);
-    localStorage.setItem("citasTaller", JSON.stringify(nuevasCitas));
+    
+    try {
+      const citaGuardada = await guardarCitaAPI(nuevaCita);
+      
+      // Actualizar el estado local
+      const nuevasCitas = [...citas, citaGuardada];
+      setCitas(nuevasCitas);
 
-    enviarRecordatorio(nuevaCita);
+      // Enviar recordatorio por email
+      enviarRecordatorio(nuevaCita);
 
-    alert("✅ Cita agendada correctamente. Se ha enviado un recordatorio por correo.");
-    setCita({ fecha: "", hora: "", servicio: "", email: "", telefono: "" });
-    setVehiculoSeleccionado(""); // Reiniciar selección
+      alert("✅ Cita agendada correctamente. Se ha enviado un recordatorio por correo.");
+      
+      // Limpiar formulario
+      setCita({ fecha: "", hora: "", servicio: "", email: "", telefono: "" });
+      setVehiculoSeleccionado("");
+      setClienteSeleccionado("");
+      
+    } catch (error) {
+      alert("❌ Error al agendar la cita. Inténtalo de nuevo.");
+      console.error("Error:", error);
+    }
   };
 
   // Filtrar citas del día actual
@@ -132,7 +228,7 @@ const AgendarCita = () => {
         <option value="">Seleccione un vehículo</option>
         {vehiculosCliente.length > 0 ? (
           vehiculosCliente.map((vehiculo, index) => (
-            <option key={index} value={vehiculo.placa}>
+            <option key={vehiculo.id || index} value={vehiculo.id || vehiculo.placa}>
               {vehiculo.marca} - {vehiculo.placa}
             </option>
           ))
@@ -193,7 +289,7 @@ const AgendarCita = () => {
       <h3>📋 Citas Agendadas</h3>
       <ul>
         {citas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha)).map((cita, index) => (
-          <li key={index}>
+          <li key={cita.id || index}>
             <strong>Cliente:</strong> {obtenerNombreCliente(cita.cliente)} <br />
             <strong>Vehículo:</strong> {cita.vehiculo} <br />
             🗓 {cita.fecha} ⏰ {cita.hora} - {cita.servicio} <br />
@@ -207,7 +303,7 @@ const AgendarCita = () => {
       <ul>
         {citasDelDia.length > 0 ? (
           citasDelDia.map((cita, index) => (
-            <li key={index}>
+            <li key={cita.id || index}>
               <strong>Cliente:</strong> {obtenerNombreCliente(cita.cliente)} <br />
               <strong>Vehículo:</strong> {cita.vehiculo} <br />
               🕒 {cita.hora} - {cita.servicio}
